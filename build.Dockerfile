@@ -5,8 +5,8 @@ RUN apk --update upgrade \
     && update-ca-certificates \
     && rm -rf /var/cache/apk/*
 
-RUN go get golang.org/x/lint/golint \
-&& go get github.com/client9/misspell/cmd/misspell
+#RUN go get golang.org/x/lint/golint \
+#&& go get github.com/client9/misspell/cmd/misspell
 
 # Which docker version to test on
 ARG DOCKER_VERSION=18.09.7
@@ -22,7 +22,7 @@ RUN mkdir -p /usr/local/bin \
     && chmod +x /usr/local/bin/go-bindata
 
 # Download misspell binary to bin folder in $GOPATH
-RUN  curl -sfL https://raw.githubusercontent.com/client9/misspell/master/install-misspell.sh | bash -s -- -b $GOPATH/bin v0.3.4
+#RUN  curl -sfL https://raw.githubusercontent.com/client9/misspell/master/install-misspell.sh | bash -s -- -b $GOPATH/bin v0.3.4
 
 WORKDIR /go/src/github.com/traefik/traefik
 
