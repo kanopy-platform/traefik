@@ -6,7 +6,6 @@ require (
 	github.com/ArthurHlt/go-eureka-client v0.0.0-20170403140305-9d0a49cbd39a
 	github.com/ArthurHlt/gominlog v0.0.0-20170402142412-72eebf980f46 // indirect
 	github.com/Azure/azure-sdk-for-go v40.3.0+incompatible // indirect
-	github.com/Azure/go-autorest/autorest v0.11.19
 	github.com/BurntSushi/toml v0.3.1
 	github.com/BurntSushi/ty v0.0.0-20140213233908-6add9cd6ad42
 	github.com/Masterminds/sprig v2.19.0+incompatible
@@ -38,10 +37,8 @@ require (
 	github.com/elazarl/go-bindata-assetfs v1.0.0
 	github.com/gambol99/go-marathon v0.7.2-0.20180614232016-99a156b96fb2
 	github.com/go-acme/lego/v4 v4.5.3
-	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect
 	github.com/go-check/check v0.0.0-00010101000000-000000000000
 	github.com/go-kit/kit v0.9.0
-	github.com/go-openapi/spec v0.19.3 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-github v9.0.0+incompatible
 	github.com/google/gofuzz v1.2.0 // indirect
