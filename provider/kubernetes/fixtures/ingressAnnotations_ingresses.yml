@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -15,7 +15,7 @@ spec:
         path: /bar
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -33,7 +33,7 @@ spec:
         path: /stuff
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -74,7 +74,7 @@ spec:
         path: /sslstuff
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -92,7 +92,7 @@ spec:
         path: /
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -110,7 +110,7 @@ spec:
         path: /auth
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -127,7 +127,7 @@ spec:
         path: /derp
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -145,7 +145,7 @@ spec:
         path: /whitelist-source-range
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -162,7 +162,7 @@ spec:
         path: /api
 
 ---
-  apiVersion: extensions/v1beta1
+  apiVersion: networking/v1
   kind: Ingress
   metadata:
     annotations:
@@ -179,7 +179,7 @@ spec:
           path: /
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -196,7 +196,7 @@ spec:
         path: /auth-realm-customized
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -213,7 +213,7 @@ spec:
         path: /https
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -238,7 +238,7 @@ spec:
         path: /errorpages
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -267,7 +267,7 @@ spec:
         path: /ratelimit
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -288,7 +288,7 @@ spec:
         path: /root1
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -306,7 +306,7 @@ spec:
         path: /
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -324,7 +324,7 @@ spec:
         path: /
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -340,7 +340,7 @@ spec:
           servicePort: 80
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -382,7 +382,7 @@ spec:
         path: /customheaders
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -399,7 +399,7 @@ spec:
         path: /valid
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -416,7 +416,7 @@ spec:
         path: /notvalid
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -433,7 +433,7 @@ spec:
         path: /missmatch
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   namespace: testing

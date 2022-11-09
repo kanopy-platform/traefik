@@ -5,13 +5,8 @@ import (
 	"io/ioutil"
 
 	corev1 "k8s.io/api/core/v1"
-<<<<<<< HEAD
-	networkingv1beta1 "k8s.io/api/extensions/v1beta1"
-	v1beta12 "k8s.io/api/extensions/v1beta1"
-=======
 	networkingv1 "k8s.io/api/networking/v1"
-	v1beta12 "k8s.io/api/networking/v1beta1"
->>>>>>> c68093d33 (update provider to networkingv1)
+	v1beta12 "k8s.io/api/networking/v1"
 )
 
 var _ Client = (*clientMock)(nil)

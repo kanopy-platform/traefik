@@ -351,7 +351,7 @@ spec:
     port: 80
     targetPort: 8080
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   name: traefik-web-ui
@@ -418,7 +418,7 @@ ports:
 To setup an HTTPS-protected ingress, you can leverage the TLS feature of the ingress resource.
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   name: traefik-web-ui
@@ -501,7 +501,7 @@ They specify basic authentication and reference the Secret `mysecret` containing
 Following is a full Ingress example based on Prometheus:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
  name: prometheus-dashboard
@@ -677,7 +677,7 @@ kubectl apply -f https://raw.githubusercontent.com/traefik/traefik/v1.7/examples
 Now we can submit an ingress for the cheese websites.
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   name: cheese
@@ -737,7 +737,7 @@ Now lets suppose that our fictional client has decided that while they are super
 No problem, we say, why don't we reconfigure the sites to host all 3 under one domain.
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   name: cheeses
@@ -792,7 +792,7 @@ It is now time to move the cheese services to a dedicated cheese namespace to si
 Simply deploy a new Ingress Object with the same host an path into the cheese namespace:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   name: cheese
@@ -827,7 +827,7 @@ Sometimes you need to specify priority for ingress routes, especially when handl
 This can be done by adding the `traefik.frontend.priority` annotation, i.e.:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   name: wildcard-cheeses
@@ -888,7 +888,7 @@ To disable passing the Host header per ingress resource set the `traefik.fronten
 Here is an example definition:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   name: example
@@ -970,7 +970,7 @@ Along with it, a Service object is created as usual.
 The Ingress specification would look like this:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
@@ -1009,7 +1009,7 @@ When specifying service weights, it is possible to omit exactly one service for 
 For instance, the following definition shows how to split requests in a scenario where a canary release is accompanied by a baseline deployment for easier metrics comparison or automated canary analysis:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking/v1
 kind: Ingress
 metadata:
   annotations:
