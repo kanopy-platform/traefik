@@ -166,7 +166,7 @@ func runCmd(globalConfiguration *configuration.GlobalConfiguration, configFile s
 	globalConfiguration.SetEffectiveConfiguration(configFile)
 	globalConfiguration.ValidateConfiguration()
 
-	log.Infof("Traefik version %s built on %s", version.Version, version.BuildDate)
+	log.Infof("Traefik version %s built on %s for MongoDB", version.Version, version.BuildDate)
 
 	jsonConf, err := json.Marshal(globalConfiguration)
 	if err != nil {
