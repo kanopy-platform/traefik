@@ -330,7 +330,7 @@ func (p *Provider) loadIngresses(k8sClient Client) (*types.Configuration, error)
 					log.Errorf("Service not found for %s/%s", i.Namespace, pa.Backend.Service.Name)
 					continue
 				} else {
-					log.Debug("Found service for %s/%s", i.Namespace, pa.Backend.Service.Name)
+					log.Debugf("Found service for %s/%s", i.Namespace, pa.Backend.Service.Name)
 				}
 
 				rule, err := getRuleForPath(pa, i)

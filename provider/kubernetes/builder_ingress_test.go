@@ -58,14 +58,14 @@ func iSpecBackend(opts ...func(*networkingv1.IngressBackend)) func(*networkingv1
 		for _, opt := range opts {
 			opt(p)
 		}
-		s.Backend = p
+		s.DefaultBackend = p
 	}
 }
 
 func iIngressBackend(name string, port intstr.IntOrString) func(*networkingv1.IngressBackend) {
 	return func(p *networkingv1.IngressBackend) {
-		p.ServiceName = name
-		p.ServicePort = port
+		p.Service.Name = name
+		p.Service.Port.Number = port.IntVal
 	}
 }
 
@@ -113,8 +113,11 @@ func iPath(name string) func(*networkingv1.HTTPIngressPath) {
 func iBackend(name string, port intstr.IntOrString) func(*networkingv1.HTTPIngressPath) {
 	return func(p *networkingv1.HTTPIngressPath) {
 		p.Backend = networkingv1.IngressBackend{
-			ServiceName: name,
-			ServicePort: port,
+			// Service:  &networkingv1.IngressServiceBackend{},
+			// Resource: &v1.TypedLocalObjectReference{},
+
+			Sekrvice.Name:       name,
+			Service.Port.Number: port,
 		}
 	}
 }
