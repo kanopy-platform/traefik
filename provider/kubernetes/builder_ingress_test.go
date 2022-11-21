@@ -113,11 +113,12 @@ func iPath(name string) func(*networkingv1.HTTPIngressPath) {
 func iBackend(name string, port intstr.IntOrString) func(*networkingv1.HTTPIngressPath) {
 	return func(p *networkingv1.HTTPIngressPath) {
 		p.Backend = networkingv1.IngressBackend{
-			// Service:  &networkingv1.IngressServiceBackend{},
-			// Resource: &v1.TypedLocalObjectReference{},
-
-			Sekrvice.Name:       name,
-			Service.Port.Number: port,
+			Service: &networkingv1.IngressServiceBackend{
+				Name: name,
+				Port: networkingv1.ServiceBackendPort{
+					Number: port.IntVal,
+				},
+			},
 		}
 	}
 }
@@ -178,15 +179,23 @@ func sampleIngress() *networkingv1.Ingress {
 								{
 									Path: "/bar",
 									Backend: networkingv1.IngressBackend{
-										ServiceName: "service1",
-										ServicePort: intstr.FromInt(80),
+										Service: &networkingv1.IngressServiceBackend{
+											Name: "service1",
+											Port: networkingv1.ServiceBackendPort{
+												Number: 80,
+											},
+										},
 									},
 								},
 								{
 									Path: "/namedthing",
 									Backend: networkingv1.IngressBackend{
-										ServiceName: "service4",
-										ServicePort: intstr.FromString("https"),
+										Service: &networkingv1.IngressServiceBackend{
+											Name: "service4",
+											Port: networkingv1.ServiceBackendPort{
+												Name: "https",
+											},
+										},
 									},
 								},
 							},
@@ -200,14 +209,22 @@ func sampleIngress() *networkingv1.Ingress {
 							Paths: []networkingv1.HTTPIngressPath{
 								{
 									Backend: networkingv1.IngressBackend{
-										ServiceName: "service3",
-										ServicePort: intstr.FromString("https"),
+										Service: &networkingv1.IngressServiceBackend{
+											Name: "service3",
+											Port: networkingv1.ServiceBackendPort{
+												Name: "https",
+											},
+										},
 									},
 								},
 								{
 									Backend: networkingv1.IngressBackend{
-										ServiceName: "service2",
-										ServicePort: intstr.FromInt(802),
+										Service: &networkingv1.IngressServiceBackend{
+											Name: "service2",
+											Port: networkingv1.ServiceBackendPort{
+												Number: 802,
+											},
+										},
 									},
 								},
 							},
