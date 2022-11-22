@@ -8,30 +8,35 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /bar
   - host: bar
     http:
       paths:
       - backend:
-          serviceName: service2
-          servicePort: 802
+          service:
+            name: service2
+            port: 80
   - host: baz
     http:
       paths:
       - backend:
-          serviceName: service3
-          servicePort: 803
+          service:
+            name: service3
+            port: 803
   - host: max-conn
     http:
       paths:
       - backend:
-          serviceName: service4
-          servicePort: 804
+          service:
+            name: service4
+            port: 804
   - host: flush
     http:
       paths:
       - backend:
-          serviceName: service5
-          servicePort: 805
+          service:
+            name: service5
+            port: 805

@@ -10,8 +10,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /stuff
 
 ---
@@ -27,8 +28,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /sslstuff
 
 ---
@@ -42,8 +44,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /
 
 ---
@@ -59,8 +62,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /bar
 
 ---
@@ -76,6 +80,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service2
-          servicePort: 80
+          service:
+            name: service2
+            port: 80
         path: /bar

@@ -4,5 +4,6 @@ metadata:
   namespace: testing
 spec:
   backend:
-    serviceName: service1
-    servicePort: 80
+    service:
+      name: service1
+      port: 80

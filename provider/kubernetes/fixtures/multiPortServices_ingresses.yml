@@ -7,10 +7,12 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: service
-          servicePort: cheddar
+          service:
+            name: service
+            port: cheddar
         path: /cheddar
       - backend:
-          serviceName: service
-          servicePort: stilton
+          service:
+            name: service
+            port: stilton
         path: /stilton

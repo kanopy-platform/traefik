@@ -10,8 +10,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /bar
 
 ---
@@ -28,8 +29,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /stuff
 
 ---
@@ -69,8 +71,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /sslstuff
 
 ---
@@ -87,8 +90,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /
 
 ---
@@ -105,8 +109,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /auth
 
 ---
@@ -122,8 +127,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service2
-          servicePort: 80
+          service:
+            name: service2
+            port: 80
         path: /derp
 
 ---
@@ -140,8 +146,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /whitelist-source-range
 
 ---
@@ -157,8 +164,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /api
 
 ---
@@ -174,8 +182,9 @@ spec:
       http:
         paths:
         - backend:
-            serviceName: service1
-            servicePort: 80
+          service:
+            name: service1
+            port: 80
           path: /
 
 ---
@@ -191,8 +200,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /auth-realm-customized
 
 ---
@@ -208,8 +218,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /https
 
 ---
@@ -233,8 +244,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /errorpages
 
 ---
@@ -262,8 +274,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /ratelimit
 
 ---
@@ -279,12 +292,14 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /root1
 
 ---
@@ -301,8 +316,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service2
-          servicePort: 80
+          service:
+            name: service2
+            port: 80
         path: /
 
 ---
@@ -319,8 +335,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service2
-          servicePort: 80
+          service:
+            name: service2
+            port: 80
         path: /
 
 ---
@@ -336,8 +353,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
 
 ---
 apiVersion: networking/v1
@@ -377,8 +395,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /customheaders
 
 ---
@@ -394,8 +413,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /valid
 
 ---
@@ -411,8 +431,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /notvalid
 
 ---
@@ -428,8 +449,9 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: serviceHTTPS
-          servicePort: 443
+          service:
+            name: serviceHTTPS
+            port: 443
         path: /missmatch
 
 ---
@@ -443,6 +465,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: serviceHTTPS
-          servicePort: 443
+          service:
+            name: serviceHTTPS
+            port: 443
         path: /noAnnotation

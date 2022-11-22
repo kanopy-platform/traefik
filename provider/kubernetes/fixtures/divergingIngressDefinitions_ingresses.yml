@@ -22,5 +22,6 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: missing
-          servicePort: "80"
+          service:
+            name: missing
+            port: "80"

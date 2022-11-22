@@ -14,17 +14,20 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: missing_service_service
-          servicePort: 80
+          service:
+            name: missing_service_service
+            port: 80
   - host: missing_endpoints
     http:
       paths:
       - backend:
-          serviceName: missing_endpoints_service
-          servicePort: 80
+          service:
+            name: missing_endpoints_service
+            port: 80
   - host: missing_endpoint_subsets
     http:
       paths:
       - backend:
-          serviceName: missing_endpoint_subsets_service
-          servicePort: 80
+          service:
+            name: missing_endpoint_subsets_service
+            port: 80

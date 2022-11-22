@@ -8,42 +8,50 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: 80
+          service:
+            name: service1
+            port: 80
         path: /bar
       - backend:
-          serviceName: service4
-          servicePort: https
+          service:
+            name: service4
+            port: https
         path: /namedthing
   - host: bar
     http:
       paths:
       - backend:
-          serviceName: service3
-          servicePort: https
+          service:
+            name: service3
+            port: https
       - backend:
-          serviceName: service2
-          servicePort: 802
+          service:
+            name: service2
+            port: 802
   - host: service5
     http:
       paths:
       - backend:
-          serviceName: service5
-          servicePort: 8888
+          service:
+            name: service5
+            port: 8888
   - host: service6
     http:
       paths:
       - backend:
-          serviceName: service6
-          servicePort: 80
+          service:
+            name: service6
+            port: 80
   - host: '*.service7'
     http:
       paths:
       - backend:
-          serviceName: service7
-          servicePort: 80
+          service:
+            name: service7
+            port: 80
   - http:
       paths:
       - backend:
-          serviceName: service8
-          servicePort: 80
+          service:
+            name: service8
+            port: 80

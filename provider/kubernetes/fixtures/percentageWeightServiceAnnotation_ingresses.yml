@@ -13,18 +13,22 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: service1
-          servicePort: "8080"
+          service:
+            name: service1
+            port: "8080"
         path: /foo
       - backend:
-          serviceName: service2
-          servicePort: "7070"
+          service:
+            name: service2
+            port: "7070"
         path: /foo
       - backend:
-          serviceName: service3
-          servicePort: "9090"
+          service:
+            name: service3
+            port: "9090"
         path: /foo
       - backend:
-          serviceName: service2
-          servicePort: "7070"
+          service:
+            name: service2
+            port: "7070"
         path: /bar

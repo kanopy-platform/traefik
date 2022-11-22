@@ -4,5 +4,6 @@ metadata:
   namespace: testing
 spec:
   backend:
-    serviceName: service1
-    servicePort: https-global
+    service:
+      name: service1
+      port: https-global

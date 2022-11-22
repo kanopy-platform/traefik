@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -26,1115 +25,1115 @@ func TestProvider_loadIngresses(t *testing.T) {
 		fixtures []string
 		expected *types.Configuration
 	}{
-		{
-			desc: "simple",
-			fixtures: []string{
-				filepath.Join("fixtures", "loadIngresses_ingresses.yml"),
-				filepath.Join("fixtures", "loadIngresses_services.yml"),
-				filepath.Join("fixtures", "loadIngresses_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("foo/bar",
-						lbMethod("wrr"),
-						servers(
-							server("http://10.10.0.1:8080", weight(1)),
-							server("http://10.21.0.1:8080", weight(1))),
-					),
-					backend("foo/namedthing",
-						lbMethod("wrr"),
-						servers(
-							server("https://example.com", weight(1)),
-						),
-					),
-					backend("bar",
-						lbMethod("wrr"),
-						servers(
-							server("https://10.15.0.1:8443", weight(1)),
-							server("https://10.15.0.2:9443", weight(1)),
-						),
-					),
-					backend("service5",
-						lbMethod("wrr"),
-						servers(
-							server("http://example.com:8888", weight(1)),
-						),
-					),
-					backend("service6",
-						lbMethod("wrr"),
-						servers(
-							server("http://10.15.0.3:80", weight(1)),
-						),
-					),
-					backend("*.service7",
-						lbMethod("wrr"),
-						servers(
-							server("http://10.10.0.7:80", weight(1)),
-						),
-					),
-					backend("service8",
-						lbMethod("wrr"),
-						servers(
-							server("http://10.10.0.8:80", weight(1)),
-						),
-					),
-				),
-				frontends(
-					frontend("foo/bar",
-						passHostHeader(),
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("foo", "Host:foo")),
-					),
-					frontend("foo/namedthing",
-						passHostHeader(),
-						routes(
-							route("/namedthing", "PathPrefix:/namedthing"),
-							route("foo", "Host:foo")),
-					),
-					frontend("bar",
-						passHostHeader(),
-						routes(route("bar", "Host:bar")),
-					),
-					frontend("service5",
-						passHostHeader(),
-						routes(route("service5", "Host:service5")),
-					),
-					frontend("service6",
-						passHostHeader(),
-						routes(route("service6", "Host:service6")),
-					),
-					frontend("*.service7",
-						passHostHeader(),
-						routes(route("*.service7", "HostRegexp:{subdomain:[A-Za-z0-9-_]+}.service7")),
-					),
-					frontend("service8",
-						passHostHeader(),
-						routes(route("/", "PathPrefix:/")),
-					),
-				),
-			),
-		},
-		{
-			desc: "loadGlobalIngressWithExternalName",
-			fixtures: []string{
-				filepath.Join("fixtures", "loadGlobalIngressWithExternalName_ingresses.yml"),
-				filepath.Join("fixtures", "loadGlobalIngressWithExternalName_services.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("global-default-backend",
-						lbMethod("wrr"),
-						servers(
-							server("http://some-external-name", weight(1)),
-						),
-					),
-				),
-				frontends(
-					frontend("global-default-backend",
-						frontendName("global-default-frontend"),
-						passHostHeader(),
-						routes(
-							route("/", "PathPrefix:/"),
-						),
-					),
-				),
-			),
-		},
-		{
-			desc: "loadGlobalIngressWithPortNumbers",
-			fixtures: []string{
-				filepath.Join("fixtures", "loadGlobalIngressWithPortNumbers_ingresses.yml"),
-				filepath.Join("fixtures", "loadGlobalIngressWithPortNumbers_services.yml"),
-				filepath.Join("fixtures", "loadGlobalIngressWithPortNumbers_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("global-default-backend",
-						lbMethod("wrr"),
-						servers(
-							server("http://10.10.0.1:8080", weight(1)),
-						),
-					),
-				),
-				frontends(
-					frontend("global-default-backend",
-						frontendName("global-default-frontend"),
-						passHostHeader(),
-						routes(
-							route("/", "PathPrefix:/"),
-						),
-					),
-				),
-			),
-		},
-		{
-			desc: "loadGlobalIngressWithMultiplePortNumbers",
-			fixtures: []string{
-				filepath.Join("fixtures", "loadGlobalIngressWithMultiplePortNumbers_ingresses.yml"),
-				filepath.Join("fixtures", "loadGlobalIngressWithMultiplePortNumbers_services.yml"),
-				filepath.Join("fixtures", "loadGlobalIngressWithMultiplePortNumbers_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("global-default-backend",
-						lbMethod("wrr"),
-						servers(
-							server("http://10.10.0.1:8080", weight(1)),
-						),
-					),
-				),
-				frontends(
-					frontend("global-default-backend",
-						frontendName("global-default-frontend"),
-						passHostHeader(),
-						routes(
-							route("/", "PathPrefix:/"),
-						),
-					),
-				),
-			),
-		},
-		{
-			desc: "loadGlobalIngressWithHttpsPortNames",
-			fixtures: []string{
-				filepath.Join("fixtures", "loadGlobalIngressWithHttpsPortNames_ingresses.yml"),
-				filepath.Join("fixtures", "loadGlobalIngressWithHttpsPortNames_services.yml"),
-				filepath.Join("fixtures", "loadGlobalIngressWithHttpsPortNames_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("global-default-backend",
-						lbMethod("wrr"),
-						servers(
-							server("https://10.10.0.1:8080", weight(1)),
-						),
-					),
-				),
-				frontends(
-					frontend("global-default-backend",
-						frontendName("global-default-frontend"),
-						passHostHeader(),
-						routes(
-							route("/", "PathPrefix:/"),
-						),
-					),
-				),
-			),
-		},
-		{
-			desc: "getPassHostHeader",
-			fixtures: []string{
-				filepath.Join("fixtures", "getPassHostHeader_ingresses.yml"),
-				filepath.Join("fixtures", "getPassHostHeader_services.yml"),
-			},
-			provider: Provider{DisablePassHostHeaders: true},
-			expected: buildConfiguration(
-				backends(backend("foo/bar", lbMethod("wrr"), servers())),
-				frontends(
-					frontend("foo/bar",
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("foo", "Host:foo")),
-					),
-				),
-			),
-		},
-		{
-			desc: "getPassTLSCert", // Deprecated
-			fixtures: []string{
-				filepath.Join("fixtures", "getPassTLSCert_ingresses.yml"),
-				filepath.Join("fixtures", "getPassTLSCert_services.yml"),
-			},
-			provider: Provider{EnablePassTLSCert: true},
-			expected: buildConfiguration(
-				backends(backend("foo/bar", lbMethod("wrr"), servers())),
-				frontends(frontend("foo/bar",
-					passHostHeader(),
-					passTLSCert(),
-					routes(
-						route("/bar", "PathPrefix:/bar"),
-						route("foo", "Host:foo")),
-				)),
-			),
-		},
-		{
-			desc: "onlyReferencesServicesFromOwnNamespace",
-			fixtures: []string{
-				filepath.Join("fixtures", "onlyReferencesServicesFromOwnNamespace_ingresses.yml"),
-				filepath.Join("fixtures", "onlyReferencesServicesFromOwnNamespace_services.yml"),
-			},
-			expected: buildConfiguration(
-				backends(backend("foo", lbMethod("wrr"), servers())),
-				frontends(frontend("foo",
-					passHostHeader(),
-					routes(route("foo", "Host:foo")),
-				)),
-			),
-		},
-		{
-			desc: "hostlessIngress",
-			fixtures: []string{
-				filepath.Join("fixtures", "hostlessIngress_ingresses.yml"),
-				filepath.Join("fixtures", "hostlessIngress_services.yml"),
-			},
-			provider: Provider{DisablePassHostHeaders: true},
-			expected: buildConfiguration(
-				backends(backend("/bar", lbMethod("wrr"), servers())),
-				frontends(frontend("/bar",
-					routes(route("/bar", "PathPrefix:/bar")))),
-			),
-		},
-		{
-			desc: "serviceAnnotations",
-			fixtures: []string{
-				filepath.Join("fixtures", "serviceAnnotations_ingresses.yml"),
-				filepath.Join("fixtures", "serviceAnnotations_services.yml"),
-				filepath.Join("fixtures", "serviceAnnotations_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("foo/bar",
-						servers(
-							server("http://10.10.0.1:8080", weight(1)),
-							server("http://10.21.0.1:8080", weight(1))),
-						lbMethod("drr"),
-						circuitBreaker("NetworkErrorRatio() > 0.5"),
-					),
-					backend("flush",
-						servers(),
-						lbMethod("wrr"),
-						responseForwarding("10ms"),
-					),
-					backend("bar",
-						servers(
-							server("http://10.15.0.1:8080", weight(1)),
-							server("http://10.15.0.2:8080", weight(1))),
-						lbMethod("wrr"), lbSticky(),
-					),
-					backend("baz",
-						servers(
-							server("http://10.14.0.1:8080", weight(1)),
-							server("http://10.12.0.1:8080", weight(1))),
-						lbMethod("wrr"),
-						buffering(
-							maxRequestBodyBytes(10485760),
-							memRequestBodyBytes(2097153),
-							maxResponseBodyBytes(10485761),
-							memResponseBodyBytes(2097152),
-							retrying("IsNetworkError() && Attempts() <= 2"),
-						),
-					),
-					backend("max-conn",
-						servers(
-							server("http://10.4.0.1:8080", weight(1)),
-							server("http://10.4.0.2:8080", weight(1))),
-						maxConnExtractorFunc("client.ip"),
-						maxConnAmount(6),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("foo/bar",
-						passHostHeader(),
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("foo", "Host:foo")),
-					),
-					frontend("bar",
-						passHostHeader(),
-						routes(route("bar", "Host:bar"))),
-					frontend("baz",
-						passHostHeader(),
-						routes(route("baz", "Host:baz"))),
-					frontend("max-conn",
-						passHostHeader(),
-						routes(
-							route("max-conn", "Host:max-conn"))),
-					frontend("flush",
-						passHostHeader(),
-						routes(
-							route("flush", "Host:flush"))),
-				),
-			),
-		},
-		{
-			desc: "ingressAnnotations",
-			fixtures: []string{
-				filepath.Join("fixtures", "ingressAnnotations_ingresses.yml"),
-				filepath.Join("fixtures", "ingressAnnotations_services.yml"),
-				filepath.Join("fixtures", "ingressAnnotations_secrets.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("foo/bar",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("other/stuff",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("http-https_other/",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("other/sslstuff",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("basic/auth",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("redirect/https",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("test/whitelist-source-range",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("rewrite/api",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("rewritetargetrootpath/",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("error-pages/errorpages",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("rate-limit/ratelimit",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("custom-headers/customheaders",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("root/",
-						servers(
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("root/root1",
-						servers(
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("root2/",
-						servers(),
-						lbMethod("wrr"),
-					),
-					backend("root3",
-						servers(
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("protocol/valid",
-						servers(
-							server("h2c://example.com", weight(1)),
-							server("h2c://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("protocol/notvalid",
-						servers(),
-						lbMethod("wrr"),
-					),
-					backend("protocol/missmatch",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("protocol/noAnnotation",
-						servers(
-							server("https://example.com", weight(1)),
-							server("https://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("foo/bar",
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("foo", "Host:foo")),
-					),
-					frontend("other/stuff",
-						passHostHeader(),
-						routes(
-							route("/stuff", "PathPrefix:/stuff"),
-							route("other", "Host:other")),
-					),
-					frontend("http-https_other/",
-						passHostHeader(),
-						entryPoints("http", "https"),
-						routes(
-							route("/", "PathPrefix:/"),
-							route("other", "Host:other")),
-					),
-					frontend("other/sslstuff",
-						passHostHeader(),
-						passTLSClientCert(),
-						passTLSCert(),
-						routes(
-							route("/sslstuff", "PathPrefix:/sslstuff"),
-							route("other", "Host:other")),
-					),
-					frontend("basic/auth",
-						passHostHeader(),
-						basicAuthDeprecated("myUser:myEncodedPW"),
-						routes(
-							route("/auth", "PathPrefix:/auth"),
-							route("basic", "Host:basic")),
-					),
-					frontend("redirect/https",
-						passHostHeader(),
-						redirectEntryPoint("https"),
-						routes(
-							route("/https", "PathPrefix:/https"),
-							route("redirect", "Host:redirect")),
-					),
-					frontend("test/whitelist-source-range",
-						passHostHeader(),
-						whiteList(true, "1.1.1.1/24", "1234:abcd::42/32"),
-						routes(
-							route("/whitelist-source-range", "PathPrefix:/whitelist-source-range"),
-							route("test", "Host:test")),
-					),
-					frontend("rewritetargetrootpath/",
-						passHostHeader(),
-						routes(
-							route("/", "PathPrefix:/;ReplacePathRegex: ^(.*) /app$1"),
-							route("rewritetargetrootpath", "Host:rewritetargetrootpath")),
-					),
-					frontend("rewrite/api",
-						passHostHeader(),
-						routes(
-							route("/api", "PathPrefix:/api;ReplacePathRegex: ^/api(.*) $1"),
-							route("rewrite", "Host:rewrite")),
-					),
-					frontend("error-pages/errorpages",
-						passHostHeader(),
-						errorPage("foo", errorQuery("/bar"), errorStatus("123", "456"), errorBackend("bar")),
-						routes(
-							route("/errorpages", "PathPrefix:/errorpages"),
-							route("error-pages", "Host:error-pages")),
-					),
-					frontend("rate-limit/ratelimit",
-						passHostHeader(),
-						rateLimit(rateExtractorFunc("client.ip"),
-							rateSet("foo", limitPeriod(6*time.Second), limitAverage(12), limitBurst(18)),
-							rateSet("bar", limitPeriod(3*time.Second), limitAverage(6), limitBurst(9))),
-						routes(
-							route("/ratelimit", "PathPrefix:/ratelimit"),
-							route("rate-limit", "Host:rate-limit")),
-					),
-					frontend("custom-headers/customheaders",
-						passHostHeader(),
-						headers(&types.Headers{
-							CustomRequestHeaders: map[string]string{
-								"Access-Control-Allow-Methods": "POST,GET,OPTIONS",
-								"Content-Type":                 "application/json; charset=utf-8",
-							},
-							CustomResponseHeaders: map[string]string{
-								"Access-Control-Allow-Methods": "POST,GET,OPTIONS",
-								"Content-Type":                 "application/json; charset=utf-8",
-							},
-							SSLProxyHeaders: map[string]string{
-								"Access-Control-Allow-Methods": "POST,GET,OPTIONS",
-								"Content-Type":                 "application/json; charset=utf-8",
-							},
-							AllowedHosts:            []string{"foo", "fii", "fuu"},
-							HostsProxyHeaders:       []string{"foo", "fii", "fuu"},
-							STSSeconds:              666,
-							SSLForceHost:            true,
-							SSLRedirect:             true,
-							SSLTemporaryRedirect:    true,
-							STSIncludeSubdomains:    true,
-							STSPreload:              true,
-							ForceSTSHeader:          true,
-							FrameDeny:               true,
-							ContentTypeNosniff:      true,
-							BrowserXSSFilter:        true,
-							IsDevelopment:           true,
-							CustomFrameOptionsValue: "foo",
-							SSLHost:                 "foo",
-							ContentSecurityPolicy:   "foo",
-							PublicKey:               "foo",
-							ReferrerPolicy:          "foo",
-							CustomBrowserXSSValue:   "foo",
-						}),
-						routes(
-							route("/customheaders", "PathPrefix:/customheaders"),
-							route("custom-headers", "Host:custom-headers")),
-					),
-					frontend("root/",
-						passHostHeader(),
-						redirectRegex("root/$", "root/root"),
-						routes(
-							route("/", "PathPrefix:/"),
-							route("root", "Host:root"),
-						),
-					),
-					frontend("root2/",
-						passHostHeader(),
-						redirectRegex("root2/$", "root2/root2"),
-						routes(
-							route("/", "PathPrefix:/;ReplacePathRegex: ^(.*) /abc$1"),
-							route("root2", "Host:root2"),
-						),
-					),
-					frontend("root/root1",
-						passHostHeader(),
-						routes(
-							route("/root1", "PathPrefix:/root1"),
-							route("root", "Host:root"),
-						),
-					),
-					frontend("root3",
-						passHostHeader(),
-						redirectRegex("root3/$", "root3/root"),
-						routes(
-							route("root3", "Host:root3"),
-						),
-					),
-					frontend("protocol/valid",
-						passHostHeader(),
-						routes(
-							route("/valid", "PathPrefix:/valid"),
-							route("protocol", "Host:protocol"),
-						),
-					),
-					frontend("protocol/notvalid",
-						passHostHeader(),
-						routes(
-							route("/notvalid", "PathPrefix:/notvalid"),
-							route("protocol", "Host:protocol"),
-						),
-					),
-					frontend("protocol/missmatch",
-						passHostHeader(),
-						routes(
-							route("/missmatch", "PathPrefix:/missmatch"),
-							route("protocol", "Host:protocol"),
-						),
-					),
-					frontend("protocol/noAnnotation",
-						passHostHeader(),
-						routes(
-							route("/noAnnotation", "PathPrefix:/noAnnotation"),
-							route("protocol", "Host:protocol"),
-						),
-					),
-				),
-			),
-		},
-		{
-			desc: "priorityHeaderValue",
-			fixtures: []string{
-				filepath.Join("fixtures", "priorityHeaderValue_ingresses.yml"),
-				filepath.Join("fixtures", "priorityHeaderValue_services.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("1337-foo/bar",
-						servers(server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("1337-foo/bar",
-						passHostHeader(),
-						priority(1337),
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("foo", "Host:foo")),
-					),
-				),
-			),
-		},
-		{
-			desc: "invalidPassTLSCertValue",
-			fixtures: []string{
-				filepath.Join("fixtures", "invalidPassTLSCertValue_ingresses.yml"),
-				filepath.Join("fixtures", "invalidPassTLSCertValue_services.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("foo/bar",
-						servers(server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("foo/bar",
-						passHostHeader(),
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("foo", "Host:foo")),
-					),
-				),
-			),
-		},
-		{
-			desc: "invalidPassHostHeaderValue",
-			fixtures: []string{
-				filepath.Join("fixtures", "invalidPassHostHeaderValue_ingresses.yml"),
-				filepath.Join("fixtures", "invalidPassHostHeaderValue_services.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("foo/bar",
-						servers(server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("foo/bar",
-						passHostHeader(),
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("foo", "Host:foo")),
-					),
-				),
-			),
-		},
-		{
-			desc: "missingResources",
-			fixtures: []string{
-				filepath.Join("fixtures", "missingResources_ingresses.yml"),
-				filepath.Join("fixtures", "missingResources_services.yml"),
-				filepath.Join("fixtures", "missingResources_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("fully_working",
-						servers(server("http://10.10.0.1:8080", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("missing_service",
-						servers(),
-						lbMethod("wrr"),
-					),
-					backend("missing_endpoints",
-						servers(),
-						lbMethod("wrr"),
-					),
-					backend("missing_endpoint_subsets",
-						servers(),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("fully_working",
-						passHostHeader(),
-						routes(route("fully_working", "Host:fully_working")),
-					),
-					frontend("missing_endpoints",
-						passHostHeader(),
-						routes(route("missing_endpoints", "Host:missing_endpoints")),
-					),
-					frontend("missing_endpoint_subsets",
-						passHostHeader(),
-						routes(route("missing_endpoint_subsets", "Host:missing_endpoint_subsets")),
-					),
-				),
-			),
-		},
-		{
-			desc: "ForwardAuth",
-			fixtures: []string{
-				filepath.Join("fixtures", "loadIngressesForwardAuth_ingresses.yml"),
-				filepath.Join("fixtures", "loadIngressesForwardAuth_services.yml"),
-				filepath.Join("fixtures", "loadIngressesForwardAuth_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("foo/bar",
-						lbMethod("wrr"),
-						servers(
-							server("http://10.10.0.1:8080", weight(1))),
-					),
-				),
-				frontends(
-					frontend("foo/bar",
-						passHostHeader(),
-						auth(forwardAuth("https://auth.host",
-							fwdTrustForwardHeader(),
-							fwdAuthResponseHeaders("X-Auth", "X-Test", "X-Secret"))),
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("foo", "Host:foo")),
-					),
-				),
-			),
-		},
-		{
-			desc: "ForwardAuthMissingURL",
-			fixtures: []string{
-				filepath.Join("fixtures", "loadIngressesForwardAuthMissingURL_ingresses.yml"),
-				filepath.Join("fixtures", "loadIngressesForwardAuthMissingURL_services.yml"),
-				filepath.Join("fixtures", "loadIngressesForwardAuthMissingURL_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("foo/bar",
-						lbMethod("wrr"),
-						servers(),
-					),
-				),
-				frontends(),
-			),
-		},
-		{
-			desc: "ForwardAuthWithTLSSecret",
-			fixtures: []string{
-				filepath.Join("fixtures", "loadIngressesForwardAuthWithTLSSecret_ingresses.yml"),
-				filepath.Join("fixtures", "loadIngressesForwardAuthWithTLSSecret_services.yml"),
-				filepath.Join("fixtures", "loadIngressesForwardAuthWithTLSSecret_endpoints.yml"),
-				filepath.Join("fixtures", "loadIngressesForwardAuthWithTLSSecret_secrets.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("foo/bar",
-						lbMethod("wrr"),
-						servers(
-							server("http://10.10.0.1:8080", weight(1))),
-					),
-				),
-				frontends(
-					frontend("foo/bar",
-						passHostHeader(),
-						auth(
-							forwardAuth("https://auth.host",
-								fwdAuthTLS(
-									"-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----",
-									"-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----",
-									true))),
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("foo", "Host:foo")),
-					),
-				),
-			),
-		},
-		{
-			desc: "tLSSecretLoad",
-			fixtures: []string{
-				filepath.Join("fixtures", "tLSSecretLoad_ingresses.yml"),
-				filepath.Join("fixtures", "tLSSecretLoad_services.yml"),
-				filepath.Join("fixtures", "tLSSecretLoad_secrets.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("ep1-ep2_example.com",
-						servers(),
-						lbMethod("wrr"),
-					),
-					backend("ep1-ep2_example.org",
-						servers(),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("ep1-ep2_example.com",
-						entryPoints("ep1", "ep2"),
-						passHostHeader(),
-						routes(
-							route("example.com", "Host:example.com"),
-						),
-					),
-					frontend("ep1-ep2_example.org",
-						entryPoints("ep1", "ep2"),
-						passHostHeader(),
-						routes(
-							route("example.org", "Host:example.org"),
-						),
-					),
-				),
-				tlsesSection(
-					tlsSection(
-						tlsEntryPoints("ep1", "ep2"),
-						certificate(
-							"-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----",
-							"-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----"),
-					),
-				),
-			),
-		},
-		{
-			desc: "multiPortServices",
-			fixtures: []string{
-				filepath.Join("fixtures", "multiPortServices_ingresses.yml"),
-				filepath.Join("fixtures", "multiPortServices_services.yml"),
-				filepath.Join("fixtures", "multiPortServices_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("/cheddar",
-						lbMethod("wrr"),
-						servers(
-							server("http://10.10.0.1:8080", weight(1)),
-							server("http://10.10.0.2:8080", weight(1)),
-						),
-					),
-					backend("/stilton",
-						lbMethod("wrr"),
-						servers(
-							server("http://10.20.0.1:8081", weight(1)),
-							server("http://10.20.0.2:8081", weight(1)),
-						),
-					),
-				),
-				frontends(
-					frontend("/cheddar",
-						passHostHeader(),
-						routes(route("/cheddar", "PathPrefix:/cheddar")),
-					),
-					frontend("/stilton",
-						passHostHeader(),
-						routes(route("/stilton", "PathPrefix:/stilton")),
-					),
-				),
-			),
-		},
-		{
-			desc: "percentageWeightServiceAnnotation",
-			fixtures: []string{
-				filepath.Join("fixtures", "percentageWeightServiceAnnotation_ingresses.yml"),
-				filepath.Join("fixtures", "percentageWeightServiceAnnotation_services.yml"),
-				filepath.Join("fixtures", "percentageWeightServiceAnnotation_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("host1/foo",
-						servers(
-							server("http://10.10.0.1:8080", weight(int(newPercentageValueFromFloat64(0.05)))),
-							server("http://10.10.0.2:8080", weight(int(newPercentageValueFromFloat64(0.05)))),
-							server("http://10.10.0.3:7070", weight(int(newPercentageValueFromFloat64(0.35)))),
-							server("http://10.10.0.4:7070", weight(int(newPercentageValueFromFloat64(0.35)))),
-							server("http://example.com:9090", weight(int(newPercentageValueFromFloat64(0.2)))),
-						),
-						lbMethod("wrr"),
-					),
-					backend("host1/bar",
-						servers(
-							server("http://10.10.0.3:7070", weight(int(newPercentageValueFromFloat64(0.5)))),
-							server("http://10.10.0.4:7070", weight(int(newPercentageValueFromFloat64(0.5)))),
-						),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("host1/bar",
-						passHostHeader(),
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("host1", "Host:host1")),
-					),
-					frontend("host1/foo",
-						passHostHeader(),
-						routes(
-							route("/foo", "PathPrefix:/foo"),
-							route("host1", "Host:host1")),
-					),
-				),
-			),
-		},
-		{
-			desc: "templateBreakingIngresssValues",
-			fixtures: []string{
-				filepath.Join("fixtures", "templateBreakingIngresssValues_ingresses.yml"),
-			},
-			expected: buildConfiguration(
-				backends(),
-				frontends(),
-			),
-		},
-		{
-			desc: "divergingIngressDefinitions",
-			fixtures: []string{
-				filepath.Join("fixtures", "divergingIngressDefinitions_ingresses.yml"),
-				filepath.Join("fixtures", "divergingIngressDefinitions_services.yml"),
-				filepath.Join("fixtures", "divergingIngressDefinitions_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("host-a",
-						servers(
-							server("http://10.10.0.1:80", weight(1)),
-							server("http://10.10.0.2:80", weight(1)),
-						),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("host-a",
-						passHostHeader(),
-						routes(
-							route("host-a", "Host:host-a")),
-					),
-				),
-			),
-		},
-		{
-			desc:     "Empty IngressClass annotation",
-			provider: Provider{},
-			fixtures: []string{
-				filepath.Join("fixtures", "ingressClassAnnotation_ingresses.yml"),
-				filepath.Join("fixtures", "ingressClassAnnotation_services.yml"),
-				filepath.Join("fixtures", "ingressClassAnnotation_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("other/stuff",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("other/",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-					backend("other/sslstuff",
-						servers(
-							server("http://example.com", weight(1)),
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("other/stuff",
-						passHostHeader(),
-						routes(
-							route("/stuff", "PathPrefix:/stuff"),
-							route("other", "Host:other")),
-					),
-					frontend("other/",
-						passHostHeader(),
-						routes(
-							route("/", "PathPrefix:/"),
-							route("other", "Host:other")),
-					),
-					frontend("other/sslstuff",
-						passHostHeader(),
-						routes(
-							route("/sslstuff", "PathPrefix:/sslstuff"),
-							route("other", "Host:other")),
-					),
-				),
-			),
-		},
-		{
-			desc:     "Provided IngressClass annotation",
-			provider: Provider{IngressClass: traefikDefaultRealm + "-other"},
-			fixtures: []string{
-				filepath.Join("fixtures", "ingressClassAnnotation_ingresses.yml"),
-				filepath.Join("fixtures", "ingressClassAnnotation_services.yml"),
-				filepath.Join("fixtures", "ingressClassAnnotation_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("foo/bar",
-						servers(
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("foo/bar",
-						passHostHeader(),
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("foo", "Host:foo")),
-					),
-				),
-			),
-		},
-		{
-			desc:     "Provided IngressClass annotation",
-			provider: Provider{IngressClass: "custom"},
-			fixtures: []string{
-				filepath.Join("fixtures", "ingressClassAnnotation_ingresses.yml"),
-				filepath.Join("fixtures", "ingressClassAnnotation_services.yml"),
-				filepath.Join("fixtures", "ingressClassAnnotation_endpoints.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("foo/bar",
-						servers(
-							server("http://10.10.0.1:80", weight(1))),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("foo/bar",
-						passHostHeader(),
-						routes(
-							route("/bar", "PathPrefix:/bar"),
-							route("foo", "Host:foo")),
-					),
-				),
-			),
-		},
-		{
-			desc:     "BasicAuth",
-			provider: Provider{},
-			fixtures: []string{
-				filepath.Join("fixtures", "loadIngressesBasicAuth_ingresses.yml"),
-				filepath.Join("fixtures", "loadIngressesBasicAuth_services.yml"),
-				filepath.Join("fixtures", "loadIngressesBasicAuth_secrets.yml"),
-			},
-			expected: buildConfiguration(
-				backends(
-					backend("basic/auth",
-						servers(
-							server("http://example.com", weight(1))),
-						lbMethod("wrr"),
-					),
-				),
-				frontends(
-					frontend("basic/auth",
-						auth(basicAuth(baUsers("myUser:myEncodedPW"), baRemoveHeaders())),
-						passHostHeader(),
-						routes(
-							route("/auth", "PathPrefix:/auth"),
-							route("basic", "Host:basic")),
-					),
-				),
-			),
-		},
+		// {
+		// 	desc: "simple",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "loadIngresses_ingresses.yml"),
+		// 		filepath.Join("fixtures", "loadIngresses_services.yml"),
+		// 		filepath.Join("fixtures", "loadIngresses_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("foo/bar",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://10.10.0.1:8080", weight(1)),
+		// 					server("http://10.21.0.1:8080", weight(1))),
+		// 			),
+		// 			backend("foo/namedthing",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("https://example.com", weight(1)),
+		// 				),
+		// 			),
+		// 			backend("bar",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("https://10.15.0.1:8443", weight(1)),
+		// 					server("https://10.15.0.2:9443", weight(1)),
+		// 				),
+		// 			),
+		// 			backend("service5",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://example.com:8888", weight(1)),
+		// 				),
+		// 			),
+		// 			backend("service6",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://10.15.0.3:80", weight(1)),
+		// 				),
+		// 			),
+		// 			backend("*.service7",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://10.10.0.7:80", weight(1)),
+		// 				),
+		// 			),
+		// 			backend("service8",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://10.10.0.8:80", weight(1)),
+		// 				),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("foo/bar",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 			frontend("foo/namedthing",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/namedthing", "PathPrefix:/namedthing"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 			frontend("bar",
+		// 				passHostHeader(),
+		// 				routes(route("bar", "Host:bar")),
+		// 			),
+		// 			frontend("service5",
+		// 				passHostHeader(),
+		// 				routes(route("service5", "Host:service5")),
+		// 			),
+		// 			frontend("service6",
+		// 				passHostHeader(),
+		// 				routes(route("service6", "Host:service6")),
+		// 			),
+		// 			frontend("*.service7",
+		// 				passHostHeader(),
+		// 				routes(route("*.service7", "HostRegexp:{subdomain:[A-Za-z0-9-_]+}.service7")),
+		// 			),
+		// 			frontend("service8",
+		// 				passHostHeader(),
+		// 				routes(route("/", "PathPrefix:/")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "loadGlobalIngressWithExternalName",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "loadGlobalIngressWithExternalName_ingresses.yml"),
+		// 		filepath.Join("fixtures", "loadGlobalIngressWithExternalName_services.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("global-default-backend",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://some-external-name", weight(1)),
+		// 				),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("global-default-backend",
+		// 				frontendName("global-default-frontend"),
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/", "PathPrefix:/"),
+		// 				),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "loadGlobalIngressWithPortNumbers",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "loadGlobalIngressWithPortNumbers_ingresses.yml"),
+		// 		filepath.Join("fixtures", "loadGlobalIngressWithPortNumbers_services.yml"),
+		// 		filepath.Join("fixtures", "loadGlobalIngressWithPortNumbers_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("global-default-backend",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://10.10.0.1:8080", weight(1)),
+		// 				),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("global-default-backend",
+		// 				frontendName("global-default-frontend"),
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/", "PathPrefix:/"),
+		// 				),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "loadGlobalIngressWithMultiplePortNumbers",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "loadGlobalIngressWithMultiplePortNumbers_ingresses.yml"),
+		// 		filepath.Join("fixtures", "loadGlobalIngressWithMultiplePortNumbers_services.yml"),
+		// 		filepath.Join("fixtures", "loadGlobalIngressWithMultiplePortNumbers_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("global-default-backend",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://10.10.0.1:8080", weight(1)),
+		// 				),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("global-default-backend",
+		// 				frontendName("global-default-frontend"),
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/", "PathPrefix:/"),
+		// 				),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "loadGlobalIngressWithHttpsPortNames",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "loadGlobalIngressWithHttpsPortNames_ingresses.yml"),
+		// 		filepath.Join("fixtures", "loadGlobalIngressWithHttpsPortNames_services.yml"),
+		// 		filepath.Join("fixtures", "loadGlobalIngressWithHttpsPortNames_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("global-default-backend",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("https://10.10.0.1:8080", weight(1)),
+		// 				),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("global-default-backend",
+		// 				frontendName("global-default-frontend"),
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/", "PathPrefix:/"),
+		// 				),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "getPassHostHeader",
+		// 	fixtures: []string{
+		// 		// filepath.Join("fixtures", "getPassHostHeader_ingresses.yml"),
+		// 		filepath.Join("fixtures", "getPassHostHeader_services.yml"),
+		// 	},
+		// 	provider: Provider{DisablePassHostHeaders: true},
+		// 	expected: buildConfiguration(
+		// 		backends(backend("foo/bar", lbMethod("wrr"), servers())),
+		// 		frontends(
+		// 			frontend("foo/bar",
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "getPassTLSCert", // Deprecated
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "getPassTLSCert_ingresses.yml"),
+		// 		filepath.Join("fixtures", "getPassTLSCert_services.yml"),
+		// 	},
+		// 	provider: Provider{EnablePassTLSCert: true},
+		// 	expected: buildConfiguration(
+		// 		backends(backend("foo/bar", lbMethod("wrr"), servers())),
+		// 		frontends(frontend("foo/bar",
+		// 			passHostHeader(),
+		// 			passTLSCert(),
+		// 			routes(
+		// 				route("/bar", "PathPrefix:/bar"),
+		// 				route("foo", "Host:foo")),
+		// 		)),
+		// 	),
+		// },
+		// {
+		// 	desc: "onlyReferencesServicesFromOwnNamespace",
+		// 	fixtures: []string{
+		// 		// filepath.Join("fixtures", "onlyReferencesServicesFromOwnNamespace_ingresses.yml"),
+		// 		filepath.Join("fixtures", "onlyReferencesServicesFromOwnNamespace_services.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(backend("foo", lbMethod("wrr"), servers())),
+		// 		frontends(frontend("foo",
+		// 			passHostHeader(),
+		// 			routes(route("foo", "Host:foo")),
+		// 		)),
+		// 	),
+		// },
+		// {
+		// 	desc: "hostlessIngress",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "hostlessIngress_ingresses.yml"),
+		// 		filepath.Join("fixtures", "hostlessIngress_services.yml"),
+		// 	},
+		// 	provider: Provider{DisablePassHostHeaders: true},
+		// 	expected: buildConfiguration(
+		// 		backends(backend("/bar", lbMethod("wrr"), servers())),
+		// 		frontends(frontend("/bar",
+		// 			routes(route("/bar", "PathPrefix:/bar")))),
+		// 	),
+		// },
+		// {
+		// 	desc: "serviceAnnotations",
+		// 	fixtures: []string{
+		// 		// filepath.Join("fixtures", "serviceAnnotations_ingresses.yml"),
+		// 		filepath.Join("fixtures", "serviceAnnotations_services.yml"),
+		// 		filepath.Join("fixtures", "serviceAnnotations_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("foo/bar",
+		// 				servers(
+		// 					server("http://10.10.0.1:8080", weight(1)),
+		// 					server("http://10.21.0.1:8080", weight(1))),
+		// 				lbMethod("drr"),
+		// 				circuitBreaker("NetworkErrorRatio() > 0.5"),
+		// 			),
+		// 			backend("flush",
+		// 				servers(),
+		// 				lbMethod("wrr"),
+		// 				responseForwarding("10ms"),
+		// 			),
+		// 			backend("bar",
+		// 				servers(
+		// 					server("http://10.15.0.1:8080", weight(1)),
+		// 					server("http://10.15.0.2:8080", weight(1))),
+		// 				lbMethod("wrr"), lbSticky(),
+		// 			),
+		// 			backend("baz",
+		// 				servers(
+		// 					server("http://10.14.0.1:8080", weight(1)),
+		// 					server("http://10.12.0.1:8080", weight(1))),
+		// 				lbMethod("wrr"),
+		// 				buffering(
+		// 					maxRequestBodyBytes(10485760),
+		// 					memRequestBodyBytes(2097153),
+		// 					maxResponseBodyBytes(10485761),
+		// 					memResponseBodyBytes(2097152),
+		// 					retrying("IsNetworkError() && Attempts() <= 2"),
+		// 				),
+		// 			),
+		// 			backend("max-conn",
+		// 				servers(
+		// 					server("http://10.4.0.1:8080", weight(1)),
+		// 					server("http://10.4.0.2:8080", weight(1))),
+		// 				maxConnExtractorFunc("client.ip"),
+		// 				maxConnAmount(6),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("foo/bar",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 			frontend("bar",
+		// 				passHostHeader(),
+		// 				routes(route("bar", "Host:bar"))),
+		// 			frontend("baz",
+		// 				passHostHeader(),
+		// 				routes(route("baz", "Host:baz"))),
+		// 			frontend("max-conn",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("max-conn", "Host:max-conn"))),
+		// 			frontend("flush",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("flush", "Host:flush"))),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "ingressAnnotations",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "ingressAnnotations_ingresses.yml"),
+		// 		filepath.Join("fixtures", "ingressAnnotations_services.yml"),
+		// 		filepath.Join("fixtures", "ingressAnnotations_secrets.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("foo/bar",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("other/stuff",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("http-https_other/",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("other/sslstuff",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("basic/auth",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("redirect/https",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("test/whitelist-source-range",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("rewrite/api",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("rewritetargetrootpath/",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("error-pages/errorpages",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("rate-limit/ratelimit",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("custom-headers/customheaders",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("root/",
+		// 				servers(
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("root/root1",
+		// 				servers(
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("root2/",
+		// 				servers(),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("root3",
+		// 				servers(
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("protocol/valid",
+		// 				servers(
+		// 					server("h2c://example.com", weight(1)),
+		// 					server("h2c://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("protocol/notvalid",
+		// 				servers(),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("protocol/missmatch",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("protocol/noAnnotation",
+		// 				servers(
+		// 					server("https://example.com", weight(1)),
+		// 					server("https://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("foo/bar",
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 			frontend("other/stuff",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/stuff", "PathPrefix:/stuff"),
+		// 					route("other", "Host:other")),
+		// 			),
+		// 			frontend("http-https_other/",
+		// 				passHostHeader(),
+		// 				entryPoints("http", "https"),
+		// 				routes(
+		// 					route("/", "PathPrefix:/"),
+		// 					route("other", "Host:other")),
+		// 			),
+		// 			frontend("other/sslstuff",
+		// 				passHostHeader(),
+		// 				passTLSClientCert(),
+		// 				passTLSCert(),
+		// 				routes(
+		// 					route("/sslstuff", "PathPrefix:/sslstuff"),
+		// 					route("other", "Host:other")),
+		// 			),
+		// 			frontend("basic/auth",
+		// 				passHostHeader(),
+		// 				basicAuthDeprecated("myUser:myEncodedPW"),
+		// 				routes(
+		// 					route("/auth", "PathPrefix:/auth"),
+		// 					route("basic", "Host:basic")),
+		// 			),
+		// 			frontend("redirect/https",
+		// 				passHostHeader(),
+		// 				redirectEntryPoint("https"),
+		// 				routes(
+		// 					route("/https", "PathPrefix:/https"),
+		// 					route("redirect", "Host:redirect")),
+		// 			),
+		// 			frontend("test/whitelist-source-range",
+		// 				passHostHeader(),
+		// 				whiteList(true, "1.1.1.1/24", "1234:abcd::42/32"),
+		// 				routes(
+		// 					route("/whitelist-source-range", "PathPrefix:/whitelist-source-range"),
+		// 					route("test", "Host:test")),
+		// 			),
+		// 			frontend("rewritetargetrootpath/",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/", "PathPrefix:/;ReplacePathRegex: ^(.*) /app$1"),
+		// 					route("rewritetargetrootpath", "Host:rewritetargetrootpath")),
+		// 			),
+		// 			frontend("rewrite/api",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/api", "PathPrefix:/api;ReplacePathRegex: ^/api(.*) $1"),
+		// 					route("rewrite", "Host:rewrite")),
+		// 			),
+		// 			frontend("error-pages/errorpages",
+		// 				passHostHeader(),
+		// 				errorPage("foo", errorQuery("/bar"), errorStatus("123", "456"), errorBackend("bar")),
+		// 				routes(
+		// 					route("/errorpages", "PathPrefix:/errorpages"),
+		// 					route("error-pages", "Host:error-pages")),
+		// 			),
+		// 			frontend("rate-limit/ratelimit",
+		// 				passHostHeader(),
+		// 				rateLimit(rateExtractorFunc("client.ip"),
+		// 					rateSet("foo", limitPeriod(6*time.Second), limitAverage(12), limitBurst(18)),
+		// 					rateSet("bar", limitPeriod(3*time.Second), limitAverage(6), limitBurst(9))),
+		// 				routes(
+		// 					route("/ratelimit", "PathPrefix:/ratelimit"),
+		// 					route("rate-limit", "Host:rate-limit")),
+		// 			),
+		// 			frontend("custom-headers/customheaders",
+		// 				passHostHeader(),
+		// 				headers(&types.Headers{
+		// 					CustomRequestHeaders: map[string]string{
+		// 						"Access-Control-Allow-Methods": "POST,GET,OPTIONS",
+		// 						"Content-Type":                 "application/json; charset=utf-8",
+		// 					},
+		// 					CustomResponseHeaders: map[string]string{
+		// 						"Access-Control-Allow-Methods": "POST,GET,OPTIONS",
+		// 						"Content-Type":                 "application/json; charset=utf-8",
+		// 					},
+		// 					SSLProxyHeaders: map[string]string{
+		// 						"Access-Control-Allow-Methods": "POST,GET,OPTIONS",
+		// 						"Content-Type":                 "application/json; charset=utf-8",
+		// 					},
+		// 					AllowedHosts:            []string{"foo", "fii", "fuu"},
+		// 					HostsProxyHeaders:       []string{"foo", "fii", "fuu"},
+		// 					STSSeconds:              666,
+		// 					SSLForceHost:            true,
+		// 					SSLRedirect:             true,
+		// 					SSLTemporaryRedirect:    true,
+		// 					STSIncludeSubdomains:    true,
+		// 					STSPreload:              true,
+		// 					ForceSTSHeader:          true,
+		// 					FrameDeny:               true,
+		// 					ContentTypeNosniff:      true,
+		// 					BrowserXSSFilter:        true,
+		// 					IsDevelopment:           true,
+		// 					CustomFrameOptionsValue: "foo",
+		// 					SSLHost:                 "foo",
+		// 					ContentSecurityPolicy:   "foo",
+		// 					PublicKey:               "foo",
+		// 					ReferrerPolicy:          "foo",
+		// 					CustomBrowserXSSValue:   "foo",
+		// 				}),
+		// 				routes(
+		// 					route("/customheaders", "PathPrefix:/customheaders"),
+		// 					route("custom-headers", "Host:custom-headers")),
+		// 			),
+		// 			frontend("root/",
+		// 				passHostHeader(),
+		// 				redirectRegex("root/$", "root/root"),
+		// 				routes(
+		// 					route("/", "PathPrefix:/"),
+		// 					route("root", "Host:root"),
+		// 				),
+		// 			),
+		// 			frontend("root2/",
+		// 				passHostHeader(),
+		// 				redirectRegex("root2/$", "root2/root2"),
+		// 				routes(
+		// 					route("/", "PathPrefix:/;ReplacePathRegex: ^(.*) /abc$1"),
+		// 					route("root2", "Host:root2"),
+		// 				),
+		// 			),
+		// 			frontend("root/root1",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/root1", "PathPrefix:/root1"),
+		// 					route("root", "Host:root"),
+		// 				),
+		// 			),
+		// 			frontend("root3",
+		// 				passHostHeader(),
+		// 				redirectRegex("root3/$", "root3/root"),
+		// 				routes(
+		// 					route("root3", "Host:root3"),
+		// 				),
+		// 			),
+		// 			frontend("protocol/valid",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/valid", "PathPrefix:/valid"),
+		// 					route("protocol", "Host:protocol"),
+		// 				),
+		// 			),
+		// 			frontend("protocol/notvalid",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/notvalid", "PathPrefix:/notvalid"),
+		// 					route("protocol", "Host:protocol"),
+		// 				),
+		// 			),
+		// 			frontend("protocol/missmatch",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/missmatch", "PathPrefix:/missmatch"),
+		// 					route("protocol", "Host:protocol"),
+		// 				),
+		// 			),
+		// 			frontend("protocol/noAnnotation",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/noAnnotation", "PathPrefix:/noAnnotation"),
+		// 					route("protocol", "Host:protocol"),
+		// 				),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "priorityHeaderValue",
+		// 	fixtures: []string{
+		// 		// filepath.Join("fixtures", "priorityHeaderValue_ingresses.yml"),
+		// 		filepath.Join("fixtures", "priorityHeaderValue_services.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("1337-foo/bar",
+		// 				servers(server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("1337-foo/bar",
+		// 				passHostHeader(),
+		// 				priority(1337),
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "invalidPassTLSCertValue",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "invalidPassTLSCertValue_ingresses.yml"),
+		// 		filepath.Join("fixtures", "invalidPassTLSCertValue_services.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("foo/bar",
+		// 				servers(server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("foo/bar",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "invalidPassHostHeaderValue",
+		// 	fixtures: []string{
+		// 		// filepath.Join("fixtures", "invalidPassHostHeaderValue_ingresses.yml"),
+		// 		filepath.Join("fixtures", "invalidPassHostHeaderValue_services.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("foo/bar",
+		// 				servers(server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("foo/bar",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "missingResources",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "missingResources_ingresses.yml"),
+		// 		filepath.Join("fixtures", "missingResources_services.yml"),
+		// 		filepath.Join("fixtures", "missingResources_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("fully_working",
+		// 				servers(server("http://10.10.0.1:8080", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("missing_service",
+		// 				servers(),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("missing_endpoints",
+		// 				servers(),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("missing_endpoint_subsets",
+		// 				servers(),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("fully_working",
+		// 				passHostHeader(),
+		// 				routes(route("fully_working", "Host:fully_working")),
+		// 			),
+		// 			frontend("missing_endpoints",
+		// 				passHostHeader(),
+		// 				routes(route("missing_endpoints", "Host:missing_endpoints")),
+		// 			),
+		// 			frontend("missing_endpoint_subsets",
+		// 				passHostHeader(),
+		// 				routes(route("missing_endpoint_subsets", "Host:missing_endpoint_subsets")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "ForwardAuth",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "loadIngressesForwardAuth_ingresses.yml"),
+		// 		filepath.Join("fixtures", "loadIngressesForwardAuth_services.yml"),
+		// 		filepath.Join("fixtures", "loadIngressesForwardAuth_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("foo/bar",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://10.10.0.1:8080", weight(1))),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("foo/bar",
+		// 				passHostHeader(),
+		// 				auth(forwardAuth("https://auth.host",
+		// 					fwdTrustForwardHeader(),
+		// 					fwdAuthResponseHeaders("X-Auth", "X-Test", "X-Secret"))),
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "ForwardAuthMissingURL",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "loadIngressesForwardAuthMissingURL_ingresses.yml"),
+		// 		filepath.Join("fixtures", "loadIngressesForwardAuthMissingURL_services.yml"),
+		// 		filepath.Join("fixtures", "loadIngressesForwardAuthMissingURL_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("foo/bar",
+		// 				lbMethod("wrr"),
+		// 				servers(),
+		// 			),
+		// 		),
+		// 		frontends(),
+		// 	),
+		// },
+		// {
+		// 	desc: "ForwardAuthWithTLSSecret",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "loadIngressesForwardAuthWithTLSSecret_ingresses.yml"),
+		// 		filepath.Join("fixtures", "loadIngressesForwardAuthWithTLSSecret_services.yml"),
+		// 		filepath.Join("fixtures", "loadIngressesForwardAuthWithTLSSecret_endpoints.yml"),
+		// 		filepath.Join("fixtures", "loadIngressesForwardAuthWithTLSSecret_secrets.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("foo/bar",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://10.10.0.1:8080", weight(1))),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("foo/bar",
+		// 				passHostHeader(),
+		// 				auth(
+		// 					forwardAuth("https://auth.host",
+		// 						fwdAuthTLS(
+		// 							"-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----",
+		// 							"-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----",
+		// 							true))),
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "tLSSecretLoad",
+		// 	fixtures: []string{
+		// 		// filepath.Join("fixtures", "tLSSecretLoad_ingresses.yml"),
+		// 		filepath.Join("fixtures", "tLSSecretLoad_services.yml"),
+		// 		filepath.Join("fixtures", "tLSSecretLoad_secrets.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("ep1-ep2_example.com",
+		// 				servers(),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("ep1-ep2_example.org",
+		// 				servers(),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("ep1-ep2_example.com",
+		// 				entryPoints("ep1", "ep2"),
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("example.com", "Host:example.com"),
+		// 				),
+		// 			),
+		// 			frontend("ep1-ep2_example.org",
+		// 				entryPoints("ep1", "ep2"),
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("example.org", "Host:example.org"),
+		// 				),
+		// 			),
+		// 		),
+		// 		tlsesSection(
+		// 			tlsSection(
+		// 				tlsEntryPoints("ep1", "ep2"),
+		// 				certificate(
+		// 					"-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----",
+		// 					"-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----"),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "multiPortServices",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "multiPortServices_ingresses.yml"),
+		// 		filepath.Join("fixtures", "multiPortServices_services.yml"),
+		// 		filepath.Join("fixtures", "multiPortServices_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("/cheddar",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://10.10.0.1:8080", weight(1)),
+		// 					server("http://10.10.0.2:8080", weight(1)),
+		// 				),
+		// 			),
+		// 			backend("/stilton",
+		// 				lbMethod("wrr"),
+		// 				servers(
+		// 					server("http://10.20.0.1:8081", weight(1)),
+		// 					server("http://10.20.0.2:8081", weight(1)),
+		// 				),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("/cheddar",
+		// 				passHostHeader(),
+		// 				routes(route("/cheddar", "PathPrefix:/cheddar")),
+		// 			),
+		// 			frontend("/stilton",
+		// 				passHostHeader(),
+		// 				routes(route("/stilton", "PathPrefix:/stilton")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc:     "percentageWeightServiceAnnotation",
+		// 	fixtures: []string{
+		// 		// filepath.Join("fixtures", "percentageWeightServiceAnnotation_ingresses.yml"),
+		// 		// filepath.Join("fixtures", "percentageWeightServiceAnnotation_services.yml"),
+		// 		// filepath.Join("fixtures", "percentageWeightServiceAnnotation_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("host1/foo",
+		// 				servers(
+		// 					server("http://10.10.0.1:8080", weight(int(newPercentageValueFromFloat64(0.05)))),
+		// 					server("http://10.10.0.2:8080", weight(int(newPercentageValueFromFloat64(0.05)))),
+		// 					server("http://10.10.0.3:7070", weight(int(newPercentageValueFromFloat64(0.35)))),
+		// 					server("http://10.10.0.4:7070", weight(int(newPercentageValueFromFloat64(0.35)))),
+		// 					server("http://example.com:9090", weight(int(newPercentageValueFromFloat64(0.2)))),
+		// 				),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("host1/bar",
+		// 				servers(
+		// 					server("http://10.10.0.3:7070", weight(int(newPercentageValueFromFloat64(0.5)))),
+		// 					server("http://10.10.0.4:7070", weight(int(newPercentageValueFromFloat64(0.5)))),
+		// 				),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("host1/bar",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("host1", "Host:host1")),
+		// 			),
+		// 			frontend("host1/foo",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/foo", "PathPrefix:/foo"),
+		// 					route("host1", "Host:host1")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc: "templateBreakingIngresssValues",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "templateBreakingIngresssValues_ingresses.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(),
+		// 		frontends(),
+		// 	),
+		// },
+		// {
+		// 	desc: "divergingIngressDefinitions",
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "divergingIngressDefinitions_ingresses.yml"),
+		// 		filepath.Join("fixtures", "divergingIngressDefinitions_services.yml"),
+		// 		filepath.Join("fixtures", "divergingIngressDefinitions_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("host-a",
+		// 				servers(
+		// 					server("http://10.10.0.1:80", weight(1)),
+		// 					server("http://10.10.0.2:80", weight(1)),
+		// 				),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("host-a",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("host-a", "Host:host-a")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc:     "Empty IngressClass annotation",
+		// 	provider: Provider{},
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "ingressClassAnnotation_ingresses.yml"),
+		// 		filepath.Join("fixtures", "ingressClassAnnotation_services.yml"),
+		// 		filepath.Join("fixtures", "ingressClassAnnotation_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("other/stuff",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("other/",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 			backend("other/sslstuff",
+		// 				servers(
+		// 					server("http://example.com", weight(1)),
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("other/stuff",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/stuff", "PathPrefix:/stuff"),
+		// 					route("other", "Host:other")),
+		// 			),
+		// 			frontend("other/",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/", "PathPrefix:/"),
+		// 					route("other", "Host:other")),
+		// 			),
+		// 			frontend("other/sslstuff",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/sslstuff", "PathPrefix:/sslstuff"),
+		// 					route("other", "Host:other")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc:     "Provided IngressClass annotation",
+		// 	provider: Provider{IngressClass: traefikDefaultRealm + "-other"},
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "ingressClassAnnotation_ingresses.yml"),
+		// 		filepath.Join("fixtures", "ingressClassAnnotation_services.yml"),
+		// 		filepath.Join("fixtures", "ingressClassAnnotation_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("foo/bar",
+		// 				servers(
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("foo/bar",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc:     "Provided IngressClass annotation",
+		// 	provider: Provider{IngressClass: "custom"},
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "ingressClassAnnotation_ingresses.yml"),
+		// 		filepath.Join("fixtures", "ingressClassAnnotation_services.yml"),
+		// 		filepath.Join("fixtures", "ingressClassAnnotation_endpoints.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("foo/bar",
+		// 				servers(
+		// 					server("http://10.10.0.1:80", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("foo/bar",
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/bar", "PathPrefix:/bar"),
+		// 					route("foo", "Host:foo")),
+		// 			),
+		// 		),
+		// 	),
+		// },
+		// {
+		// 	desc:     "BasicAuth",
+		// 	provider: Provider{},
+		// 	fixtures: []string{
+		// 		filepath.Join("fixtures", "loadIngressesBasicAuth_ingresses.yml"),
+		// 		filepath.Join("fixtures", "loadIngressesBasicAuth_services.yml"),
+		// 		filepath.Join("fixtures", "loadIngressesBasicAuth_secrets.yml"),
+		// 	},
+		// 	expected: buildConfiguration(
+		// 		backends(
+		// 			backend("basic/auth",
+		// 				servers(
+		// 					server("http://example.com", weight(1))),
+		// 				lbMethod("wrr"),
+		// 			),
+		// 		),
+		// 		frontends(
+		// 			frontend("basic/auth",
+		// 				auth(basicAuth(baUsers("myUser:myEncodedPW"), baRemoveHeaders())),
+		// 				passHostHeader(),
+		// 				routes(
+		// 					route("/auth", "PathPrefix:/auth"),
+		// 					route("basic", "Host:basic")),
+		// 			),
+		// 		),
+		// 	),
+		// },
 	}
 
 	for _, test := range testCases {
