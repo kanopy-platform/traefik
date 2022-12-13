@@ -43,7 +43,7 @@ func newClientMock(paths ...string) clientMock {
 				c.secrets = append(c.secrets, o)
 			case *corev1.Endpoints:
 				c.endpoints = append(c.endpoints, o)
-			case *v1beta12.Ingress:
+			case *networkingv1.Ingress:
 				c.ingresses = append(c.ingresses, o)
 			default:
 				panic(fmt.Sprintf("Unknown runtime object %+v %T", o, o))
