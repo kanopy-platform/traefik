@@ -1,4 +1,4 @@
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -15,20 +15,24 @@ spec:
       - backend:
           service:
             name: service1
-            port: "8080"
+            port:
+              number: "8080"
         path: /foo
       - backend:
           service:
             name: service2
-            port: "7070"
+            port:
+              number: "7070"
         path: /foo
       - backend:
           service:
             name: service3
-            port: "9090"
+            port:
+              number: "9090"
         path: /foo
       - backend:
           service:
             name: service2
-            port: "7070"
+            port:
+              number: "7070"
         path: /bar

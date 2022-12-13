@@ -1,4 +1,4 @@
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   namespace: testing
@@ -9,10 +9,12 @@ spec:
       - backend:
           service:
             name: service
-            port: cheddar
+            port:
+              name: cheddar
         path: /cheddar
       - backend:
           service:
             name: service
-            port: stilton
+            port:
+              name: stilton
         path: /stilton

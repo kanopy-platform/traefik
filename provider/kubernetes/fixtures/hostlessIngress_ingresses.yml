@@ -1,4 +1,4 @@
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   namespace: awesome
@@ -9,5 +9,6 @@ spec:
       - backend:
           service:
             name: service1
-            port: 801
+            port:
+              number: 801
         path: /bar

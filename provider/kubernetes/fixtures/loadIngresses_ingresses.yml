@@ -1,4 +1,4 @@
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   namespace: testing
@@ -10,12 +10,14 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /bar
       - backend:
           service:
             name: service4
-            port: https
+            port:
+              name: https
         path: /namedthing
   - host: bar
     http:
@@ -23,35 +25,41 @@ spec:
       - backend:
           service:
             name: service3
-            port: https
+            port:
+              name: https
       - backend:
           service:
             name: service2
-            port: 802
+            port:
+              number: 802
   - host: service5
     http:
       paths:
       - backend:
           service:
             name: service5
-            port: 8888
+            port:
+              number: 8888
   - host: service6
     http:
       paths:
       - backend:
           service:
             name: service6
-            port: 80
+            port:
+              number: 80
   - host: '*.service7'
     http:
       paths:
       - backend:
           service:
             name: service7
-            port: 80
+            port:
+              number: 80
   - http:
       paths:
       - backend:
           service:
             name: service8
-            port: 80
+            port:
+              number: 80

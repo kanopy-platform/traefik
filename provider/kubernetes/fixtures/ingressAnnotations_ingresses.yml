@@ -1,4 +1,4 @@
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -12,11 +12,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /bar
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -31,11 +32,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /stuff
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -73,11 +75,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /sslstuff
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -92,11 +95,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -111,11 +115,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /auth
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -129,11 +134,12 @@ spec:
       - backend:
           service:
             name: service2
-            port: 80
+            port:
+              number: 80
         path: /derp
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -148,11 +154,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /whitelist-source-range
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -166,11 +173,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /api
 
 ---
-  apiVersion: networking/v1
+  apiVersion: networking.k8s.io/v1
   kind: Ingress
   metadata:
     annotations:
@@ -184,11 +192,12 @@ spec:
         - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
           path: /
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -202,11 +211,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /auth-realm-customized
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -220,11 +230,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /https
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -246,11 +257,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /errorpages
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -276,11 +288,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /ratelimit
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -294,16 +307,18 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /root1
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -318,11 +333,12 @@ spec:
       - backend:
           service:
             name: service2
-            port: 80
+            port:
+              number: 80
         path: /
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -337,11 +353,12 @@ spec:
       - backend:
           service:
             name: service2
-            port: 80
+            port:
+              number: 80
         path: /
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -355,10 +372,11 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -397,11 +415,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /customheaders
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -415,11 +434,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /valid
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -433,11 +453,12 @@ spec:
       - backend:
           service:
             name: service1
-            port: 80
+            port:
+              number: 80
         path: /notvalid
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -451,11 +472,12 @@ spec:
       - backend:
           service:
             name: serviceHTTPS
-            port: 443
+            port:
+              number: 443
         path: /missmatch
 
 ---
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   namespace: testing
@@ -467,5 +489,6 @@ spec:
       - backend:
           service:
             name: serviceHTTPS
-            port: 443
+            port:
+              number: 443
         path: /noAnnotation
