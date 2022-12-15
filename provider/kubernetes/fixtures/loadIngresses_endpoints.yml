@@ -17,7 +17,7 @@ subsets:
 apiVersion: v1
 kind: Endpoints
 metadata:
-  name: service4
+  name: service3
   namespace: testing
 subsets:
 - addresses:
