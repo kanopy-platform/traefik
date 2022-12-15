@@ -876,7 +876,7 @@ func equalPorts(servicePort corev1.ServicePort, ingressPort networkingv1.Service
 	if int(servicePort.Port) == int(ingressPort.Number) {
 		return true
 	}
-	if servicePort.Name != "" && servicePort.Name == ingressPort.String() {
+	if servicePort.Name != "" && (servicePort.Name == ingressPort.String() || (servicePort.Name == ingressPort.Name) && ingressPort.Number == 0) {
 		return true
 	}
 	return false
