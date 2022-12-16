@@ -1,0 +1,12 @@
+---
+kind: pipeline
+type: kubernetes
+name: default
+
+steps:
+  - name: test-unit
+    image: golang:1.18
+    environment:
+      GOCACHE: /drone/src/gocache/
+    commands:
+      - make test-unit
