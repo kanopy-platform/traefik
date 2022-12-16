@@ -9,4 +9,4 @@ steps:
     environment:
       GOCACHE: /drone/src/gocache/
     commands:
-      - make test-unit
+      - ./script/test-unit
