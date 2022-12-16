@@ -10,4 +10,5 @@ steps:
       GOCACHE: /drone/src/gocache/
     commands:
       - go mod download
+      - go get github.com/containous/go-bindata/...
       - ./script/make.sh generate test-unit
