@@ -3,7 +3,6 @@ package kubernetes
 import (
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -1298,24 +1297,6 @@ func Test_addGlobalBackend(t *testing.T) {
 			assert.EqualError(t, err, test.expected)
 		})
 	}
-}
-
-func TestProvider_newK8sClient_inCluster(t *testing.T) {
-	p := Provider{}
-	os.Setenv("KUBERNETES_SERVICE_HOST", "localhost")
-	os.Setenv("KUBERNETES_SERVICE_PORT", "443")
-	defer os.Clearenv()
-	_, err := p.newK8sClient("")
-	assert.EqualError(t, err, "failed to create in-cluster configuration: open /var/run/secrets/kubernetes.io/serviceaccount/token: no such file or directory")
-}
-
-func TestProvider_newK8sClient_inCluster_failLabelSel(t *testing.T) {
-	p := Provider{}
-	os.Setenv("KUBERNETES_SERVICE_HOST", "localhost")
-	os.Setenv("KUBERNETES_SERVICE_PORT", "443")
-	defer os.Clearenv()
-	_, err := p.newK8sClient("%")
-	assert.EqualError(t, err, "invalid ingress label selector: \"%\"")
 }
 
 func TestProvider_newK8sClient_outOfCluster(t *testing.T) {
