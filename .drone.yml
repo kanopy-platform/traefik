@@ -9,4 +9,5 @@ steps:
     environment:
       GOCACHE: /drone/src/gocache/
     commands:
+      - go mod download
       - ./script/test-unit
