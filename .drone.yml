@@ -10,4 +10,4 @@ steps:
       GOCACHE: /drone/src/gocache/
     commands:
       - go mod download
-      - ./script/test-unit
+      - ./script/make.sh generate test-unit
