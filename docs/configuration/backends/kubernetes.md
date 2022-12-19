@@ -381,7 +381,7 @@ More information are available in the  [User Guide](/user-guide/kubernetes/#add-
 Ingresses can be created that look like the following:
 
 ```yaml
-apiVersion: networking/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: cheese
