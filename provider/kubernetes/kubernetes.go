@@ -573,7 +573,7 @@ func (p *Provider) addGlobalBackend(cl Client, i *networkingv1.Ingress, template
 
 				protocol := "http"
 				for _, address := range subset.Addresses {
-					if endpointPort == 443 || strings.HasPrefix(i.Spec.DefaultBackend.Service.Port.String(), "https") {
+					if endpointPort == 443 || strings.HasPrefix(i.Spec.DefaultBackend.Service.Port.Name, "https") {
 						protocol = "https"
 					}
 
