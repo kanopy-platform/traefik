@@ -16,23 +16,23 @@ spec:
           service:
             name: service1
             port:
-              number: "8080"
+              number: 8080
         path: /foo
       - backend:
           service:
             name: service2
             port:
-              number: "7070"
+              number: 7070
         path: /foo
       - backend:
           service:
             name: service3
             port:
-              number: "9090"
+              number: 9090
         path: /foo
       - backend:
           service:
             name: service2
             port:
-              number: "7070"
+              number: 7070
         path: /bar

@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   namespace: testing
 spec:
-  backend:
+  defaultBackend:
     service:
       name: service1
       port:
