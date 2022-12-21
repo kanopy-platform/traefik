@@ -320,14 +320,19 @@ func (p *Provider) loadIngresses(k8sClient Client) (*types.Configuration, error)
 					}
 				}
 
-				service, exists, err := k8sClient.GetService(i.Namespace, pa.Backend.Service.Name)
+				var bsn string
+				if pa.Backend.Service != nil {
+					log.Warn("Backend service is nil")
+					bsn = pa.Backend.Service.Name
+				}
+				service, exists, err := k8sClient.GetService(i.Namespace, bsn)
 				if err != nil {
-					log.Errorf("Error while retrieving service information from k8s API %s/%s: %v", i.Namespace, pa.Backend.Service.Name, err)
+					log.Warn("Returning nil")
 					return nil, err
 				}
 
 				if !exists {
-					log.Errorf("Service not found for %s/%s", i.Namespace, pa.Backend.Service.Name)
+					log.Errorf("Service not found for %s/%s", i.Namespace, bsn)
 					continue
 				}
 
