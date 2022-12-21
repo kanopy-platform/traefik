@@ -190,10 +190,10 @@ spec:
       http:
         paths:
         - backend:
-          service:
-            name: service1
-            port:
-              number: 80
+            service:
+              name: service1
+              port:
+                number: 80
           path: /
 
 ---

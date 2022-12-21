@@ -8,9 +8,10 @@ spec:
     http:
       paths:
       - backend:
-          name: fully_working_service
-          port:
-            number: 80
+          service:
+            name: fully_working_service
+            port:
+              number: 80
   - host: missing_service
     http:
       paths:

@@ -20,7 +20,7 @@ spec:
           service:
             name: service2
             port:
-              number: 80
+              number: 802
   - host: baz
     http:
       paths:
