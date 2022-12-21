@@ -287,7 +287,7 @@ func TestProvider_loadIngresses(t *testing.T) {
 		{
 			desc: "serviceAnnotations",
 			fixtures: []string{
-				// filepath.Join("fixtures", "serviceAnnotations_ingresses.yml"),
+				filepath.Join("fixtures", "serviceAnnotations_ingresses.yml"),
 				filepath.Join("fixtures", "serviceAnnotations_services.yml"),
 				filepath.Join("fixtures", "serviceAnnotations_endpoints.yml"),
 			},
