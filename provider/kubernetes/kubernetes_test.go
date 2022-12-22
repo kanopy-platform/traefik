@@ -1307,7 +1307,9 @@ func TestProvider_newK8sClient_inCluster(t *testing.T) {
 	os.Setenv("KUBERNETES_SERVICE_PORT", "443")
 	defer os.Clearenv()
 	_, err := p.newK8sClient("")
-	assert.EqualError(t, err, "failed to create in-cluster configuration: open /var/run/secrets/kubernetes.io/serviceaccount/token: no such file or directory")
+	if err != nil {
+		assert.EqualError(t, err, "failed to create in-cluster configuration: open /var/run/secrets/kubernetes.io/serviceaccount/token: no such file or directory")
+	}
 }
 
 func TestProvider_newK8sClient_inCluster_failLabelSel(t *testing.T) {
