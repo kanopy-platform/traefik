@@ -363,8 +363,10 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: traefik-web-ui
-          servicePort: web
+          service:
+            name: traefik-web-ui
+            port:
+              name: web
 ```
 
 [examples/k8s/ui.yaml](https://github.com/traefik/traefik/tree/v1.7/examples/k8s/ui.yaml)
@@ -431,8 +433,10 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: traefik-web-ui
-          servicePort: 80
+          service:
+            name: traefik-web-ui
+            port:
+              number: 80
   tls:
    - secretName: traefik-ui-tls-cert
 ```
@@ -516,8 +520,10 @@ spec:
    http:
      paths:
      - backend:
-         serviceName: prometheus
-         servicePort: 9090
+          service:
+            name: prometheus
+            port:
+              number: 9090
 ```
 
 You can apply the example as following:
@@ -690,22 +696,28 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: stilton
-          servicePort: http
+          service:
+            name: stilton
+            port:
+              name: http
   - host: cheddar.minikube
     http:
       paths:
       - path: /
         backend:
-          serviceName: cheddar
-          servicePort: http
+          service:
+            name: cheddar
+            port:
+              name: http
   - host: wensleydale.minikube
     http:
       paths:
       - path: /
         backend:
-          serviceName: wensleydale
-          servicePort: http
+          service:
+            name: wensleydale
+            port:
+              name: http
 ```
 
 [examples/k8s/cheese-ingress.yaml](https://github.com/traefik/traefik/tree/v1.7/examples/k8s/cheese-ingress.yaml)
@@ -751,16 +763,22 @@ spec:
       paths:
       - path: /stilton
         backend:
-          serviceName: stilton
-          servicePort: http
+          service:
+            name: stilton
+            port:
+              name: http
       - path: /cheddar
         backend:
-          serviceName: cheddar
-          servicePort: http
+          service:
+            name: cheddar
+            port:
+              name: http
       - path: /wensleydale
         backend:
-          serviceName: wensleydale
-          servicePort: http
+          service:
+            name: wensleydale
+            port:
+              name: http
 ```
 
 [examples/k8s/cheeses-ingress.yaml](https://github.com/traefik/traefik/tree/v1.7/examples/k8s/cheeses-ingress.yaml)
@@ -807,8 +825,10 @@ spec:
       paths:
       - path: /cheddar
         backend:
-          serviceName: cheddar
-          servicePort: http
+          service:
+            name: cheddar
+            port:
+              name: http
 ```
 
 Traefik will now look for cheddar service endpoints (ports on healthy pods) in both the cheese and the default namespace.
@@ -840,8 +860,10 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: stilton
-          servicePort: http
+          service:
+            name: stilton
+            port:
+              name: http
 
 kind: Ingress
 metadata:
@@ -855,8 +877,10 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: stilton
-          servicePort: http
+          service:
+            name: stilton
+            port:
+              name: http
 ```
 
 Note that priority values must be quoted to avoid numeric interpretation (which are illegal for annotations).
@@ -902,8 +926,10 @@ spec:
       paths:
       - path: /static
         backend:
-          serviceName: static
-          servicePort: https
+          service:
+            name: static
+            port:
+              name: https
 ```
 
 And an example service definition:
@@ -983,12 +1009,16 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: my-app
-          servicePort: 80
+          service:
+            name: my-app
+            port:
+              number: 80
         path: /
       - backend:
-          serviceName: my-app-canary
-          servicePort: 80
+          service:
+            name: my-app-canary
+            port:
+              number: 80
         path: /
 ```
 
@@ -1022,16 +1052,22 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: my-app-canary
-          servicePort: 80
+          service:
+            name: my-app-canary
+            port:
+              number: 80
         path: /
       - backend:
-          serviceName: my-app-baseline
-          servicePort: 80
+          service:
+            name: my-app-baseline
+            port:
+              number: 80
         path: /
       - backend:
-          serviceName: my-app-main
-          servicePort: 80
+          service:
+            name: my-app-main
+            port:
+              number: 80
         path: /
 ```
 
