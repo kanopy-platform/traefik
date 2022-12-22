@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func buildIngress(opts ...func(*networkingv1.Ingress)) *networkingv1.Ingress {
@@ -62,11 +61,11 @@ func iSpecBackend(opts ...func(*networkingv1.IngressBackend)) func(*networkingv1
 	}
 }
 
-func iIngressBackend(name string, port intstr.IntOrString) func(*networkingv1.IngressBackend) {
+func iIngressBackend(name string, port networkingv1.ServiceBackendPort) func(*networkingv1.IngressBackend) {
 	return func(p *networkingv1.IngressBackend) {
 		p.Service = new(networkingv1.IngressServiceBackend)
 		p.Service.Name = name
-		p.Service.Port = iPort(port)
+		p.Service.Port = port
 	}
 }
 
@@ -111,27 +110,12 @@ func iPath(name string) func(*networkingv1.HTTPIngressPath) {
 	}
 }
 
-func iPort(port intstr.IntOrString) networkingv1.ServiceBackendPort {
-	if port.IntVal != 0 {
-		return networkingv1.ServiceBackendPort{
-			Number: port.IntVal,
-		}
-	}
-
-	if port.StrVal != "" {
-		return networkingv1.ServiceBackendPort{
-			Name: port.StrVal,
-		}
-	}
-
-	return networkingv1.ServiceBackendPort{}
-}
-func iBackend(name string, port intstr.IntOrString) func(*networkingv1.HTTPIngressPath) {
+func iBackend(name string, port networkingv1.ServiceBackendPort) func(*networkingv1.HTTPIngressPath) {
 	return func(p *networkingv1.HTTPIngressPath) {
 		p.Backend = networkingv1.IngressBackend{
 			Service: &networkingv1.IngressServiceBackend{
 				Name: name,
-				Port: iPort(port),
+				Port: port,
 			},
 		}
 	}
@@ -161,12 +145,12 @@ func TestBuildIngress(t *testing.T) {
 		iNamespace("testing"),
 		iRules(
 			iRule(iHost("foo"), iPaths(
-				onePath(iPath("/bar"), iBackend("service1", intstr.FromInt(80))),
-				onePath(iPath("/namedthing"), iBackend("service4", intstr.FromString("https")))),
+				onePath(iPath("/bar"), iBackend("service1", networkingv1.ServiceBackendPort{Number: 80})),
+				onePath(iPath("/namedthing"), iBackend("service4", networkingv1.ServiceBackendPort{Name: "https"}))),
 			),
 			iRule(iHost("bar"), iPaths(
-				onePath(iBackend("service3", intstr.FromString("https"))),
-				onePath(iBackend("service2", intstr.FromInt(802))),
+				onePath(iBackend("service3", networkingv1.ServiceBackendPort{Name: "https"})),
+				onePath(iBackend("service2", networkingv1.ServiceBackendPort{Number: 802})),
 			),
 			),
 		),
