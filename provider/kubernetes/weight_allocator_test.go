@@ -273,8 +273,13 @@ func TestComputeServiceWeights(t *testing.T) {
 			},
 		},
 		{
-			desc:        "2 path no service",
+			desc:        "2 path no service ingresses",
 			ingress:     filepath.Join("fixtures", "computeServiceWeights", "2_path_no_service_ingresses.yml"),
+			expectError: true,
+		},
+		{
+			desc:        "2 path no service",
+			ingress:     filepath.Join("fixtures", "computeServiceWeights", "2_path_no_service.yml"),
 			expectError: true,
 		},
 		{
