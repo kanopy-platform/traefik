@@ -66,7 +66,7 @@ func iIngressBackend(name string, port intstr.IntOrString) func(*networkingv1.In
 	return func(p *networkingv1.IngressBackend) {
 		p.Service = new(networkingv1.IngressServiceBackend)
 		p.Service.Name = name
-		p.Service.Port.Number = port.IntVal
+		p.Service.Port = iPort(port)
 	}
 }
 
@@ -111,15 +111,27 @@ func iPath(name string) func(*networkingv1.HTTPIngressPath) {
 	}
 }
 
+func iPort(port intstr.IntOrString) networkingv1.ServiceBackendPort {
+	if port.IntVal != 0 {
+		return networkingv1.ServiceBackendPort{
+			Number: port.IntVal,
+		}
+	}
+
+	if port.StrVal != "" {
+		return networkingv1.ServiceBackendPort{
+			Name: port.StrVal,
+		}
+	}
+
+	return networkingv1.ServiceBackendPort{}
+}
 func iBackend(name string, port intstr.IntOrString) func(*networkingv1.HTTPIngressPath) {
 	return func(p *networkingv1.HTTPIngressPath) {
 		p.Backend = networkingv1.IngressBackend{
 			Service: &networkingv1.IngressServiceBackend{
 				Name: name,
-				Port: networkingv1.ServiceBackendPort{
-					Number: port.IntVal,
-					Name:   port.StrVal,
-				},
+				Port: iPort(port),
 			},
 		}
 	}
