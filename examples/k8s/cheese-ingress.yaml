@@ -9,19 +9,24 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: stilton
-          servicePort: http
+          service:
+            name: stilton
+            port:
+              name: http
   - host: cheddar.minikube
     http:
       paths:
       - path: /
         backend:
-          serviceName: cheddar
-          servicePort: http
+          service:
+            name: cheddar
+            port:
+              name: http
   - host: wensleydale.minikube
     http:
       paths:
       - path: /
         backend:
-          serviceName: wensleydale
-          servicePort: http
+          service:
+            name: wensleydale
+            port:

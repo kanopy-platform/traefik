@@ -4,5 +4,7 @@ metadata:
   name: cheese-default
 spec:
   backend:
-    serviceName: stilton
-    servicePort: 80
+    service:
+      name: stilton
+      port:
+        number: 80
