@@ -166,16 +166,12 @@ func getServiceInstanceCounts(ingress *networkingv1.Ingress, client Client) (map
 
 	for _, rule := range ingress.Spec.Rules {
 		for _, pa := range rule.HTTP.Paths {
-			var backendServiceName string
-			if pa.Backend.Service != nil {
-				backendServiceName = pa.Backend.Service.Name
-			}
-			svc, exists, err := client.GetService(ingress.Namespace, backendServiceName)
+			svc, exists, err := client.GetService(ingress.Namespace, pa.Backend.Service.Name)
 			if err != nil {
-				return nil, fmt.Errorf("failed to get service %s/%s: %v", ingress.Namespace, backendServiceName, err)
+				return nil, fmt.Errorf("failed to get service %s/%s: %v", ingress.Namespace, pa.Backend.Service.Name, err)
 			}
 			if !exists {
-				return nil, fmt.Errorf("service not found for %s/%s", ingress.Namespace, backendServiceName)
+				return nil, fmt.Errorf("service not found for %s/%s", ingress.Namespace, pa.Backend.Service.Name)
 			}
 			if svc.Spec.Type == corev1.ServiceTypeExternalName {
 				// external-name service has only one instance b/c it will actually be interpreted as a DNS record
@@ -183,17 +179,17 @@ func getServiceInstanceCounts(ingress *networkingv1.Ingress, client Client) (map
 				serviceInstanceCounts[ingressService{
 					host:    rule.Host,
 					path:    pa.Path,
-					service: backendServiceName,
+					service: pa.Backend.Service.Name,
 				}] = 1
 				continue
 			}
 			count := 0
-			endpoints, exists, err := client.GetEndpoints(ingress.Namespace, backendServiceName)
+			endpoints, exists, err := client.GetEndpoints(ingress.Namespace, pa.Backend.Service.Name)
 			if err != nil {
-				return nil, fmt.Errorf("failed to get endpoints %s/%s: %v", ingress.Namespace, backendServiceName, err)
+				return nil, fmt.Errorf("failed to get endpoints %s/%s: %v", ingress.Namespace, pa.Backend.Service.Name, err)
 			}
 			if !exists {
-				return nil, fmt.Errorf("endpoints not found for %s/%s", ingress.Namespace, backendServiceName)
+				return nil, fmt.Errorf("endpoints not found for %s/%s", ingress.Namespace, pa.Backend.Service.Name)
 			}
 
 			for _, subset := range endpoints.Subsets {
@@ -203,7 +199,7 @@ func getServiceInstanceCounts(ingress *networkingv1.Ingress, client Client) (map
 			serviceInstanceCounts[ingressService{
 				host:    rule.Host,
 				path:    pa.Path,
-				service: backendServiceName,
+				service: pa.Backend.Service.Name,
 			}] += count
 		}
 	}
