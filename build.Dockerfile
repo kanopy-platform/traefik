@@ -22,7 +22,7 @@ RUN mkdir -p /usr/local/bin \
     && chmod +x /usr/local/bin/go-bindata
 
 # Download misspell binary to bin folder in $GOPATH
-#RUN  curl -sfL https://raw.githubusercontent.com/client9/misspell/master/install-misspell.sh | bash -s -- -b $GOPATH/bin v0.3.4
+RUN  curl -sfL https://raw.githubusercontent.com/client9/misspell/master/install-misspell.sh | bash -s -- -b $GOPATH/bin v0.3.4
 
 WORKDIR /go/src/github.com/traefik/traefik
 
