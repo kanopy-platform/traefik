@@ -78,15 +78,11 @@ func newFractionalWeightAllocator(ingress *networkingv1.Ingress, client Client) 
 				fractionalPathWeights[pa.Path] = newPercentageValueFromFloat64(1)
 			}
 
-			var backendServiceName string
-			if pa.Backend.Service != nil {
-				backendServiceName = pa.Backend.Service.Name
-			}
-			if weight, ok := servicePercentageWeights[backendServiceName]; ok {
+			if weight, ok := servicePercentageWeights[pa.Backend.Service.Name]; ok {
 				ingSvc := ingressService{
 					host:    rule.Host,
 					path:    pa.Path,
-					service: backendServiceName,
+					service: pa.Backend.Service.Name,
 				}
 
 				serviceWeights[ingSvc] = weight.computeWeight(serviceInstanceCounts[ingSvc])

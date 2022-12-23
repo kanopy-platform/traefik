@@ -261,7 +261,7 @@ func (p *Provider) loadIngresses(k8sClient Client) (*types.Configuration, error)
 
 				baseName := r.Host + pa.Path
 
-				if len(baseName) == 0 && pa.Backend.Service != nil {
+				if len(baseName) == 0 {
 					baseName = pa.Backend.Service.Name
 				}
 
