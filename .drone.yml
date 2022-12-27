@@ -1,0 +1,16 @@
+---
+kind: pipeline
+type: kubernetes
+name: default
+
+steps:
+  - name: test-unit
+    image: golang:1.18
+    environment:
+      GOCACHE: /drone/src/gocache/
+    commands:
+      - go mod download
+      - go get github.com/containous/go-bindata/...
+      - go install github.com/containous/go-bindata/...
+      - mkdir -p webui/static && touch webui/static/index.html 
+      - ./script/make.sh generate test-unit

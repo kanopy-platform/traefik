@@ -4,7 +4,7 @@ metadata:
   name: service1
   namespace: testing
 spec:
-  clusterIP: 10.0.0.1
+  clusterIP: "10.0.0.1"
   externalName: example.com
   ports:
   - name: http
@@ -18,7 +18,7 @@ metadata:
   name: service2
   namespace: testing
 spec:
-  clusterIP: 10.0.0.2
+  clusterIP: "10.0.0.2"
   ports:
   - name: http
     port: 80

@@ -351,7 +351,7 @@ spec:
     port: 80
     targetPort: 8080
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: traefik-web-ui
@@ -363,8 +363,10 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: traefik-web-ui
-          servicePort: web
+          service:
+            name: traefik-web-ui
+            port:
+              name: web
 ```
 
 [examples/k8s/ui.yaml](https://github.com/traefik/traefik/tree/v1.7/examples/k8s/ui.yaml)
@@ -418,7 +420,7 @@ ports:
 To setup an HTTPS-protected ingress, you can leverage the TLS feature of the ingress resource.
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: traefik-web-ui
@@ -431,8 +433,10 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: traefik-web-ui
-          servicePort: 80
+          service:
+            name: traefik-web-ui
+            port:
+              number: 80
   tls:
    - secretName: traefik-ui-tls-cert
 ```
@@ -501,7 +505,7 @@ They specify basic authentication and reference the Secret `mysecret` containing
 Following is a full Ingress example based on Prometheus:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
  name: prometheus-dashboard
@@ -516,8 +520,10 @@ spec:
    http:
      paths:
      - backend:
-         serviceName: prometheus
-         servicePort: 9090
+          service:
+            name: prometheus
+            port:
+              number: 9090
 ```
 
 You can apply the example as following:
@@ -677,7 +683,7 @@ kubectl apply -f https://raw.githubusercontent.com/traefik/traefik/v1.7/examples
 Now we can submit an ingress for the cheese websites.
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: cheese
@@ -690,22 +696,28 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: stilton
-          servicePort: http
+          service:
+            name: stilton
+            port:
+              name: http
   - host: cheddar.minikube
     http:
       paths:
       - path: /
         backend:
-          serviceName: cheddar
-          servicePort: http
+          service:
+            name: cheddar
+            port:
+              name: http
   - host: wensleydale.minikube
     http:
       paths:
       - path: /
         backend:
-          serviceName: wensleydale
-          servicePort: http
+          service:
+            name: wensleydale
+            port:
+              name: http
 ```
 
 [examples/k8s/cheese-ingress.yaml](https://github.com/traefik/traefik/tree/v1.7/examples/k8s/cheese-ingress.yaml)
@@ -737,7 +749,7 @@ Now lets suppose that our fictional client has decided that while they are super
 No problem, we say, why don't we reconfigure the sites to host all 3 under one domain.
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: cheeses
@@ -751,16 +763,22 @@ spec:
       paths:
       - path: /stilton
         backend:
-          serviceName: stilton
-          servicePort: http
+          service:
+            name: stilton
+            port:
+              name: http
       - path: /cheddar
         backend:
-          serviceName: cheddar
-          servicePort: http
+          service:
+            name: cheddar
+            port:
+              name: http
       - path: /wensleydale
         backend:
-          serviceName: wensleydale
-          servicePort: http
+          service:
+            name: wensleydale
+            port:
+              name: http
 ```
 
 [examples/k8s/cheeses-ingress.yaml](https://github.com/traefik/traefik/tree/v1.7/examples/k8s/cheeses-ingress.yaml)
@@ -792,7 +810,7 @@ It is now time to move the cheese services to a dedicated cheese namespace to si
 Simply deploy a new Ingress Object with the same host an path into the cheese namespace:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: cheese
@@ -807,8 +825,10 @@ spec:
       paths:
       - path: /cheddar
         backend:
-          serviceName: cheddar
-          servicePort: http
+          service:
+            name: cheddar
+            port:
+              name: http
 ```
 
 Traefik will now look for cheddar service endpoints (ports on healthy pods) in both the cheese and the default namespace.
@@ -827,7 +847,7 @@ Sometimes you need to specify priority for ingress routes, especially when handl
 This can be done by adding the `traefik.frontend.priority` annotation, i.e.:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: wildcard-cheeses
@@ -840,8 +860,10 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: stilton
-          servicePort: http
+          service:
+            name: stilton
+            port:
+              name: http
 
 kind: Ingress
 metadata:
@@ -855,8 +877,10 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: stilton
-          servicePort: http
+          service:
+            name: stilton
+            port:
+              name: http
 ```
 
 Note that priority values must be quoted to avoid numeric interpretation (which are illegal for annotations).
@@ -888,7 +912,7 @@ To disable passing the Host header per ingress resource set the `traefik.fronten
 Here is an example definition:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: example
@@ -902,8 +926,10 @@ spec:
       paths:
       - path: /static
         backend:
-          serviceName: static
-          servicePort: https
+          service:
+            name: static
+            port:
+              name: https
 ```
 
 And an example service definition:
@@ -970,7 +996,7 @@ Along with it, a Service object is created as usual.
 The Ingress specification would look like this:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -983,12 +1009,16 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: my-app
-          servicePort: 80
+          service:
+            name: my-app
+            port:
+              number: 80
         path: /
       - backend:
-          serviceName: my-app-canary
-          servicePort: 80
+          service:
+            name: my-app-canary
+            port:
+              number: 80
         path: /
 ```
 
@@ -1009,7 +1039,7 @@ When specifying service weights, it is possible to omit exactly one service for 
 For instance, the following definition shows how to split requests in a scenario where a canary release is accompanied by a baseline deployment for easier metrics comparison or automated canary analysis:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -1022,16 +1052,22 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: my-app-canary
-          servicePort: 80
+          service:
+            name: my-app-canary
+            port:
+              number: 80
         path: /
       - backend:
-          serviceName: my-app-baseline
-          servicePort: 80
+          service:
+            name: my-app-baseline
+            port:
+              number: 80
         path: /
       - backend:
-          serviceName: my-app-main
-          servicePort: 80
+          service:
+            name: my-app-main
+            port:
+              number: 80
         path: /
 ```
 

@@ -17,7 +17,7 @@ import (
 // MustEncodeYaml Encode object to YAML.
 //
 // ex:
-// 	MustEncodeYaml(ingresses[0], "extensions/v1beta1", "ingress.yml")
+// 	MustEncodeYaml(ingresses[0], "networking/v1", "ingress.yml")
 // 	MustEncodeYaml(services[0], "v1", "service.yml")
 // 	MustEncodeYaml(endpoints[0], "v1", "endpoint.yml")
 func MustEncodeYaml(object runtime.Object, groupName string, w io.Writer) {

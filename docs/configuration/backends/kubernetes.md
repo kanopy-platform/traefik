@@ -261,7 +261,7 @@ Conveniently, users need not bother to compute the percentage remainder for a ma
 For instance, in the example above `service_backend3` does not need to be specified to be assigned 75%.
 
 !!! note
-    For each service weight given, the Ingress specification must include a backend item with the corresponding `serviceName` and (if given) matching path.
+    For each service weight given, the Ingress specification must include a backend item with the corresponding `service` and (if given) matching path.
 
 Currently, 3 decimal places for the weight are supported.
 An attempt to exceed the precision should be avoided as it may lead to percentage computation flaws and, in consequence, Ingress parsing errors.
@@ -381,14 +381,16 @@ More information are available in the  [User Guide](/user-guide/kubernetes/#add-
 Ingresses can be created that look like the following:
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: cheese
 spec:
   backend:
-    serviceName: stilton
-    servicePort: 80
+    service:
+      name: stilton
+      port:
+        number: 80
 ```
 
 This ingress follows the [Global Default Backend](https://kubernetes.io/docs/concepts/services-networking/ingress/#the-ingress-resource) property of ingresses.
