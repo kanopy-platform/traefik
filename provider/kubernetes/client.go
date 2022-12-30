@@ -127,7 +127,7 @@ func (c *clientImpl) WatchAll(namespaces Namespaces, stopCh <-chan struct{}) (<-
 	eventHandler := c.newResourceEventHandler(eventCh)
 	for _, ns := range namespaces {
 		factory := informers.NewFilteredSharedInformerFactory(c.clientset, resyncPeriod, ns, nil)
-		factory.Extensions().V1beta1().Ingresses().Informer().AddEventHandler(eventHandler)
+		factory.Networking().V1().Ingresses().Informer().AddEventHandler(eventHandler)
 		factory.Core().V1().Services().Informer().AddEventHandler(eventHandler)
 		factory.Core().V1().Endpoints().Informer().AddEventHandler(eventHandler)
 		c.factories[ns] = factory
