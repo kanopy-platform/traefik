@@ -5,7 +5,7 @@ name: default
 
 steps:
   - name: test-unit
-    image: golang:1.18
+    image: golang:1.19
     environment:
       GOCACHE: /drone/src/gocache/
     commands:
