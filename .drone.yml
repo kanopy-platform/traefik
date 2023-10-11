@@ -5,12 +5,11 @@ name: default
 
 steps:
   - name: test-unit
-    image: golang:1.18
+    image: golang:1.19
     environment:
       GOCACHE: /drone/src/gocache/
     commands:
       - go mod download
-      - go get github.com/containous/go-bindata/...
-      - go install github.com/containous/go-bindata/...
+      - go install github.com/containous/go-bindata/go-bindata@v1.0.0
       - mkdir -p webui/static && touch webui/static/index.html 
       - ./script/make.sh generate test-unit
