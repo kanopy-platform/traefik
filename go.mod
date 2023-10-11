@@ -15,7 +15,6 @@ require (
 	github.com/VividCortex/gohistogram v1.0.0 // indirect
 	github.com/abbot/go-http-auth v0.0.0-00010101000000-000000000000
 	github.com/abronan/valkeyrie v0.2.0
-	github.com/apache/thrift v0.12.0 // indirect
 	github.com/armon/go-metrics v0.3.8 // indirect
 	github.com/armon/go-proxyproto v0.0.0-20170620220930-48572f11356f
 	github.com/aws/aws-sdk-go v1.39.0
@@ -39,10 +38,10 @@ require (
 	github.com/go-acme/lego/v4 v4.5.3
 	github.com/go-check/check v0.0.0-00010101000000-000000000000
 	github.com/go-kit/kit v0.9.0
-	github.com/golang/protobuf v1.5.2
+	github.com/golang/protobuf v1.5.3
 	github.com/google/go-github v9.0.0+incompatible
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/google/uuid v1.1.2
+	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/gravitational/trace v1.1.3 // indirect
 	github.com/hashicorp/consul/api v1.9.1
@@ -77,13 +76,13 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/philhofer/fwd v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.11.0
-	github.com/prometheus/client_model v0.2.0
+	github.com/prometheus/client_model v0.4.0
 	github.com/rancher/go-rancher v0.1.1-0.20171004213057-52e2f4895340
 	github.com/rancher/go-rancher-metadata v0.0.0-00010101000000-000000000000
 	github.com/ryanuber/go-glob v1.0.0
 	github.com/shopspring/decimal v1.1.1-0.20191009025716-f1972eb1d1f5
 	github.com/sirupsen/logrus v1.8.1
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.8.3
 	github.com/stvp/go-udp-testing v0.0.0-20171104055251-c4434f09ec13
 	github.com/thoas/stats v0.0.0-20190104110215-4975baf6a358
 	github.com/tinylib/msgp v1.0.2 // indirect
@@ -96,8 +95,8 @@ require (
 	github.com/vdemeester/shakers v0.1.0
 	github.com/vulcand/oxy v1.2.0
 	go.etcd.io/bbolt v1.3.5 // indirect
-	golang.org/x/net v0.0.0-20211209124913-491a49abca63
-	google.golang.org/grpc v1.38.0
+	golang.org/x/net v0.17.0
+	google.golang.org/grpc v1.58.3
 	gopkg.in/DataDog/dd-trace-go.v1 v1.13.0
 	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/yaml.v2 v2.4.0
